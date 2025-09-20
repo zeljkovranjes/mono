@@ -1,20 +1,18 @@
-"use client";
-
-import { ReactNode } from "react";
+import { JSX } from "solid-js";
 
 interface ButtonProps {
-  children: ReactNode;
+  children: JSX.Element;
   className?: string;
   appName: string;
 }
 
-export const Button = ({ children, className, appName }: ButtonProps) => {
+export function Button(props: ButtonProps) {
   return (
     <button
-      className={className}
-      onClick={() => alert(`Hello from your ${appName} app!`)}
+      class={props.className}
+      onClick={() => alert(`Hello from your ${props.appName} app!`)}
     >
-      {children}
+      {props.children}
     </button>
   );
-};
+}

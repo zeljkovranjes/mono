@@ -1,6 +1,7 @@
 {
-  "extends": "@safeoutput/typescript-config/react-library.json",
+  "extends": "@safeoutput/typescript-config/solid-library.json",
   "compilerOptions": {
+    "jsx": "preserve",
     "outDir": "dist"
   },
   "include": ["src"],
