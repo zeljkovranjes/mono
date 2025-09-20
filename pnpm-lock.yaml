@@ -20,6 +20,9 @@ importers:
 
   apps/dashboard:
     dependencies:
+      '@safeoutput/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@solidjs/router':
         specifier: ^0.15.0
         version: 0.15.3(solid-js@1.9.9)
@@ -48,9 +51,6 @@ importers:
       tailwindcss:
         specifier: ^4.0.7
         version: 4.1.13
-      typescript:
-        specifier: 5.9.2
-        version: 5.9.2
 
   packages/eslint-config:
     devDependencies:
