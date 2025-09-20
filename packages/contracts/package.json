@@ -1,0 +1,32 @@
+{
+  "name": "@safeoutput/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "exports": {
+    "./audit/schema": "./src/audit/schema.ts",
+    "./audit/contract": "./src/audit/contract.ts",
+    "./organization/schema": "./src/organization/schema.ts",
+    "./organization/contract": "./src/organizationan/contract.ts",
+    "./plan/schema": "./src/plan/schema.ts",
+    "./plan/contract": "./src/plan/contract.ts",
+    "./project/schema": "./src/project/schema.ts",
+    "./project/contract": "./src/project/contract.ts",
+    "./*": "./src/*.tsx"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --write \"**/*.{ts,tsx}\"",
+    "check-types": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@safeoutput/eslint-config": "workspace:*",
+    "@safeoutput/typescript-config": "workspace:*",
+    "@types/node": "^22.15.3",
+    "eslint": "^9.34.0",
+    "typescript": "5.9.2"
+  },
+  "dependencies": {
+    "solid-js": "^1.9.9",
+    "zod": "^4.1.11"
+  }
+}
