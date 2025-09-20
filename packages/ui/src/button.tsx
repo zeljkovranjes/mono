@@ -1,4 +1,4 @@
-import { JSX } from "solid-js";
+import { JSX } from 'solid-js';
 
 interface ButtonProps {
   children: JSX.Element;
@@ -8,10 +8,7 @@ interface ButtonProps {
 
 export function Button(props: ButtonProps) {
   return (
-    <button
-      class={props.className}
-      onClick={() => alert(`Hello from your ${props.appName} app!`)}
-    >
+    <button class={props.className} onClick={() => alert(`Hello from your ${props.appName} app!`)}>
       {props.children}
     </button>
   );

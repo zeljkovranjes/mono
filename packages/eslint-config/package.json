@@ -4,7 +4,11 @@
   "type": "module",
   "private": true,
   "exports": {
-    "./base": "./base.js"
+    "./base": "./base.js",
+    "./solid-internal": "./solid-internal.js"
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
   },
   "devDependencies": {
     "@eslint/js": "^9.34.0",

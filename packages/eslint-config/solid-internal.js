@@ -2,8 +2,8 @@ import js from "@eslint/js";
 import eslintConfigPrettier from "eslint-config-prettier";
 import tseslint from "typescript-eslint";
 import globals from "globals";
-import pluginSolid from "eslint-plugin-solid";
 import { config as baseConfig } from "./base.js";
+import { solidFlatConfig } from "./solid-flat.js"; // <- helper we made
 
 /**
  * A custom ESLint configuration for libraries that use SolidStart.
@@ -15,7 +15,7 @@ export const config = [
   js.configs.recommended,
   eslintConfigPrettier,
   ...tseslint.configs.recommended,
-  pluginSolid.configs["recommended"],
+  solidFlatConfig("typescript"),
   {
     languageOptions: {
       globals: {
