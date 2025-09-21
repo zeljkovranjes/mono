@@ -30,8 +30,7 @@ export const OrganizationSchema = z.object({
     .regex(/^[a-z0-9-]+$/),
   type: OrganizationTypeSchema,
   metadata: z.record(z.string(), z.unknown()).default({}),
-  stripe_customer_id: z.string().max(255).nullable(),
-  stripe_subscription_status: StripeSubscriptionStatusSchema.nullable(),
+  subscription_status: StripeSubscriptionStatusSchema.nullable(),
   current_plan_id: z.uuid().nullable(),
   created_at: z.iso.datetime(),
   updated_at: z.iso.datetime(),
@@ -59,8 +58,7 @@ export const UpdateOrganizationSchema = z.object({
     .optional(),
   type: OrganizationTypeSchema.optional(),
   metadata: z.record(z.string(), z.unknown()).optional(),
-  stripe_customer_id: z.string().max(255).nullable().optional(),
-  stripe_subscription_status: StripeSubscriptionStatusSchema.nullable().optional(),
+  subscription_status: StripeSubscriptionStatusSchema.nullable().optional(),
   current_plan_id: z.uuid().nullable().optional(),
 });
 
