@@ -99,10 +99,13 @@ export const createPaginatedResponse = <T extends z.ZodTypeAny>(itemSchema: T) =
     }),
   );
 
+export const GatewayHeadersSchema = z.object();
+/*
 export const GatewayHeadersSchema = z.object({
-  'x-organization-id': z.uuid(),
-  'x-user-id': z.uuid(),
+  'x-organization-id': z.uuid().optional(),
+  'x-user-id': z.uuid().optional(),
 });
+*/
 
 export interface ApiContract {
   method: z.infer<typeof HttpMethodSchema>;
