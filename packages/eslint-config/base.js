@@ -31,7 +31,7 @@ export const config = [
     ignores: ['dist/**', '.vinxi/**', '.output/**'],
   },
 
-  // --- Universal fences ---
+  // --- Fence: prevent server imports in client code ---
   {
     files: ['**/client/**/*.{ts,tsx,js,jsx}'],
     rules: {
@@ -39,17 +39,6 @@ export const config = [
         'error',
         {
           patterns: ['**/server/*', '../server/*', '../../server/*'],
-        },
-      ],
-    },
-  },
-  {
-    files: ['**/server/**/*.{ts,tsx,js,jsx}'],
-    rules: {
-      'no-restricted-imports': [
-        'error',
-        {
-          patterns: ['**/client/*', '../client/*', '../../client/*'],
         },
       ],
     },
