@@ -5,16 +5,7 @@
     "build": {
       "dependsOn": ["lint", "format", "^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["dist/**", ".output/**", "!.output/cache/**"],
-      "env": [
-        "ORY_ADMIN_API_TOKEN",
-        "COOKIE_SECRET",
-        "API_SECRET_KEY",
-        "STRIPE_SECRET_KEY",
-        "STRIPE_WEBHOOK_SECRET",
-        "POSTGRES_DATABASE_URL",
-        "OTEL_EXPORTER_URL"
-      ]
+      "outputs": ["dist/**", ".output/**", "!.output/cache/**"]
     },
     "lint": {
       "dependsOn": ["^lint"]
@@ -27,16 +18,7 @@
     },
     "dev": {
       "cache": false,
-      "persistent": true,
-      "env": [
-        "ORY_ADMIN_API_TOKEN",
-        "COOKIE_SECRET",
-        "API_SECRET_KEY",
-        "STRIPE_SECRET_KEY",
-        "STRIPE_WEBHOOK_SECRET",
-        "POSTGRES_DATABASE_URL",
-        "OTEL_EXPORTER_URL"
-      ]
+      "persistent": true
     }
   }
 }
