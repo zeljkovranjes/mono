@@ -54,33 +54,4 @@ export const config = [
       ],
     },
   },
-
-  // --- SolidStart fences ---
-  {
-    files: ['src/components/**/*.{ts,tsx}'],
-    rules: {
-      'no-restricted-imports': ['error', { patterns: ['../server/*', 'src/server/*'] }],
-    },
-  },
-  {
-    files: ['src/server/**/*.{ts,tsx}'],
-    rules: {
-      'no-restricted-imports': ['error', { patterns: ['../components/*', 'src/components/*'] }],
-    },
-  },
-  {
-    // Route components (.tsx) → client, forbid server imports
-    files: ['src/routes/**/*.tsx'],
-    rules: {
-      'no-restricted-imports': ['error', { patterns: ['../server/*', 'src/server/*'] }],
-    },
-  },
-  {
-    // Route handlers (.ts) → server, forbid client imports
-    files: ['src/routes/**/*.ts'],
-    excludedFiles: ['src/routes/**/*.tsx'],
-    rules: {
-      'no-restricted-imports': ['error', { patterns: ['../components/*', 'src/components/*'] }],
-    },
-  },
 ];
