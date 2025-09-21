@@ -4,10 +4,10 @@
   "private": true,
   "exports": {
     "./client/*": {
-      "browser": "./src/client/*.tsx"
+      "browser": "./src/client/*.ts"
     },
     "./server/*": {
-      "node": "./src/server/*.tsx"
+      "node": "./src/server/*.ts"
     }
   },
   "browser": {
@@ -17,7 +17,7 @@
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
-    "format": "prettier --write \"**/*.{ts,tsx}\"",
+    "format": "prettier --write \"**/*.ts\"",
     "check-types": "tsc --noEmit"
   },
   "devDependencies": {
