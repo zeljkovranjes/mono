@@ -1,4 +1,4 @@
-import { config } from "@safeoutput/eslint-config/solid-internal";
+import { config } from '@safeoutput/eslint-config/solidstart';
 
 /** @type {import("eslint").Linter.Config} */
 export default config;
