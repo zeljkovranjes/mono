@@ -3,7 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "exports": {
-    "./*": "./src/*.tsx"
+    "./client/*": {
+      "browser": "./src/client/*.tsx"
+    },
+    "./server/*": {
+      "node": "./src/server/*.tsx"
+    }
+  },
+  "browser": {
+    "fs": false,
+    "path": false,
+    "crypto": false
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
@@ -17,9 +27,19 @@
     "eslint": "^9.34.0",
     "typescript": "5.9.2"
   },
-  "dependencies": {
-    "kysely": "^0.28.7",
+  "peerDependencies": {
     "pg": "^8.16.3",
+    "kysely": "^0.28.7"
+  },
+  "peerDependenciesMeta": {
+    "pg": {
+      "optional": true
+    },
+    "kysely": {
+      "optional": true
+    }
+  },
+  "dependencies": {
     "zod": "^4.1.11"
   }
 }
