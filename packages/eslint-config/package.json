@@ -5,7 +5,8 @@
   "private": true,
   "exports": {
     "./base": "./base.js",
-    "./solid-internal": "./solid-internal.js"
+    "./solid-internal": "./solid-internal.js",
+    "./solidstart": "./solidstart.js"
   },
   "scripts": {
     "check-types": "tsc --noEmit"
