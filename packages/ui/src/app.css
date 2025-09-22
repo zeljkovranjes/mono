@@ -31,16 +31,17 @@
     --destructive: 357.18 100% 45%;
     --destructive-foreground: 0 0% 98%;
 
-    --info: 204 94% 94%;
-    --info-foreground: 199 89% 48%;
+    /* Modern callout colors - light mode */
+    --info: 210 100% 96%;
+    --info-foreground: 210 92% 45%;
 
-    --success: 149 80% 90%;
-    --success-foreground: 160 84% 39%;
+    --success: 142 76% 96%;
+    --success-foreground: 142 71% 45%;
 
-    --warning: 48 96% 89%;
-    --warning-foreground: 25 95% 53%;
+    --warning: 48 100% 96%;
+    --warning-foreground: 38 92% 50%;
 
-    --error: 0 93% 94%;
+    --error: 0 100% 97%;
     --error-foreground: 0 84% 60%;
 
     --ring: 225.35 84% 49%;
@@ -77,17 +78,18 @@
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --info: 204 94% 94%;
-    --info-foreground: 199 89% 48%;
+    /* Modern callout colors - dark mode */
+    --info: 210 100% 12%;
+    --info-foreground: 210 100% 70%;
 
-    --success: 149 80% 90%;
-    --success-foreground: 160 84% 39%;
+    --success: 142 76% 12%;
+    --success-foreground: 142 76% 70%;
 
-    --warning: 48 96% 89%;
-    --warning-foreground: 25 95% 53%;
+    --warning: 48 100% 12%;
+    --warning-foreground: 48 100% 70%;
 
-    --error: 0 93% 94%;
-    --error-foreground: 0 84% 60%;
+    --error: 0 100% 12%;
+    --error-foreground: 0 100% 70%;
 
     --ring: 240 4.9% 83.9%;
 
@@ -116,6 +118,11 @@
     @apply absolute w-9 h-9 bg-muted rounded-full font-mono font-medium text-center text-base inline-flex items-center justify-center -indent-px border-4 border-background;
     @apply ml-[-50px] mt-[-4px];
     content: counter(step);
+  }
+
+  /* Modern callout enhancements */
+  .callout-glow {
+    box-shadow: 0 0 20px -12px currentColor;
   }
 }
 
