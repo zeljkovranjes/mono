@@ -4,7 +4,6 @@
   "private": true,
   "exports": {
     "./client/*": "./src/client/*.ts",
-    "./client/env/*": "./src/client/env/*.ts",
     "./server/*": "./src/server/*.ts"
   },
   "browser": {
