@@ -41,11 +41,11 @@ export function setupClient(cfg: ClientEnv) {
  *           `@safeoutput/lib`. Consumers of the library should not call
  *           it directly.
  */
-export function getClientConfig(): ClientEnv {
+export function getClientConfig(): IClientEnvSchema {
   if (!clientEnv) {
     throw new Error(
       'Client environment has not been initialized. Call setupClient() at app startup.',
     );
   }
-  return clientEnv;
+  return clientEnv.client;
 }
