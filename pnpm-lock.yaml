@@ -24,6 +24,9 @@ importers:
 
   apps/dashboard:
     dependencies:
+      '@ory/client':
+        specifier: ^1.22.2
+        version: 1.22.2
       '@safeoutput/lib':
         specifier: workspace:*
         version: link:../../packages/lib
