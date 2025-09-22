@@ -23,7 +23,7 @@ const buttonVariants = cva(
           'bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-gray-400 shadow-button pressed:bg-secondary/70 pressed:border-gray-500 pressed:shadow-inset-t-black-100 disabled:opacity-60',
         ghost:
           'hover:bg-accent hover:text-accent-foreground pressed:shadow-inset-t-black-100 disabled:opacity-60',
-        link: 'text-primary underline-offset-4 hover:underline pressed:text-primary/80 disabled:opacity-60',
+        link: 'text-primary underline-offset-4 hover:underline pressed:text-primary/80 disabled:opacity-60a p-0',
       },
       size: {
         default: 'h-9.5 px-4 py-2',
