@@ -6,8 +6,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@safeoutput/ui/components/card';
-import { LabeledSeparator, Separator } from '@safeoutput/ui/components/separator';
+import { LabeledSeparator } from '@safeoutput/ui/components/separator';
 import { TextField, TextFieldInput, TextFieldLabel } from '@safeoutput/ui/components/text-field';
+import { getPlatformBullet } from '~/utils/display';
 
 export default function Login() {
   return (
@@ -29,7 +30,7 @@ export default function Login() {
         </TextField>
         <TextField>
           <TextFieldLabel>Password</TextFieldLabel>
-          <TextFieldInput type="password" placeholder="●●●●●●●●●" />
+          <TextFieldInput type="password" placeholder={getPlatformBullet().repeat(12)} />
         </TextField>
         <Button>Log in to account</Button>
       </CardContent>
