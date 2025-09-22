@@ -200,6 +200,9 @@ export default function Login() {
         </div>
         <Skeleton height={40} width={336} radius={6} />
       </CardContent>
+      <CardFooter class="">
+        <Skeleton height={20} width={150} radius={4} />
+      </CardFooter>
     </Card>
   );
 
