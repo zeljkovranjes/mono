@@ -22,6 +22,10 @@ let clientEnv: ClientEnv | null = null;
  * ```
  */
 export function setupClient(cfg: ClientEnv) {
+  if (clientEnv) {
+    return;
+  }
+
   const name = chalk.underline(pkg.name);
   const version = chalk.dim(`v${pkg.version}`);
 
