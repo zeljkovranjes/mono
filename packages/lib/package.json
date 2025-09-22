@@ -4,13 +4,16 @@
   "private": true,
   "exports": {
     "./client/*": "./src/client/*.ts",
-    "./server/*": "./src/server/*.ts"
+    "./server/*": {
+      "node": "./src/server/*.ts"
+    }
   },
+  "sideEffects": false,
   "browser": {
     "fs": false,
     "path": false,
     "crypto": false,
-    "./src/server/*": false
+    "./server/*": false
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
