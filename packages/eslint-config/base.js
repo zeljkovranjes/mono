@@ -38,7 +38,14 @@ export const config = [
       'no-restricted-imports': [
         'error',
         {
-          patterns: ['**/server/*', '../server/*', '../../server/*'],
+          patterns: [
+            '**/server/*',
+            '../server/*',
+            '../../server/*',
+
+            '**/shared/**/server',
+            '**/shared/**/server.*',
+          ],
         },
       ],
     },
