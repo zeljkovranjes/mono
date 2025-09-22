@@ -38,7 +38,16 @@ export const config = [
       'no-restricted-imports': [
         'error',
         {
-          patterns: ['**/server/*', '@**/server/*', 'packages/**/server/*'],
+          patterns: [
+            // forbid server imports
+            '**/server/*',
+            '@**/server/*',
+            'packages/**/server/*',
+
+            // forbid shared server helpers
+            '**/shared/**/server',
+            '**/shared/**/server.*',
+          ],
         },
       ],
     },
@@ -48,14 +57,23 @@ export const config = [
   {
     files: [
       '**/src/server/**/*.{ts,tsx}',
-      '**/src/routes/**/*.ts', // handlers
+      '**/src/routes/**/*.ts', // handlers only
       '**/entry-server.{ts,tsx}',
     ],
     rules: {
       'no-restricted-imports': [
         'error',
         {
-          patterns: ['**/components/*', '@**/components/*', 'packages/**/components/*'],
+          patterns: [
+            // forbid client imports
+            '**/components/*',
+            '@**/components/*',
+            'packages/**/components/*',
+
+            // forbid shared client helpers
+            '**/shared/**/client',
+            '**/shared/**/client.*',
+          ],
         },
       ],
     },
