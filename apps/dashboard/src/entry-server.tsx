@@ -1,11 +1,9 @@
 // @refresh reload
-import { parse, setupServer } from '@safeoutput/lib/server/env/runtime';
+import { setupServer } from '@safeoutput/lib/server/env/runtime';
 import { createHandler, StartServer } from '@solidjs/start/server';
 
 // inject server side envs into @safeoutput/lib
-setupServer({
-  server: parse(process.env),
-});
+setupServer(process.env);
 
 export default createHandler(() => (
   <StartServer

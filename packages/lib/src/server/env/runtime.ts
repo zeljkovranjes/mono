@@ -2,26 +2,19 @@ import { serverEnvSchema, type IServerEnvSchema } from './schema';
 import pkg from '../../../package.json';
 import chalk from 'chalk';
 
-export interface ServerEnv {
-  server: IServerEnvSchema;
-}
-
-let serverEnv: ServerEnv | null = null;
+let serverEnv: IServerEnvSchema | null = null;
 
 /**
  * Initializes the server environment for this package.
  *
- * @param cfg The validated server environment, typically created by parsing
- *            `process.env` with `serverEnvSchema.parse(process.env)`.
+ * @param env The environment source (e.g., process.env).
  *
  * Example:
  * ```ts
- * setupServer({
- *   server: serverEnvSchema.parse(process.env),
- * });
+ * setupServer(process.env);
  * ```
  */
-export function setupServer(cfg: ServerEnv) {
+export function setupServer(env: Record<string, unknown>) {
   if (serverEnv) {
     return;
   }
@@ -30,8 +23,15 @@ export function setupServer(cfg: ServerEnv) {
   const version = chalk.dim(`v${pkg.version}`);
 
   console.log(chalk.gray(`→ Initializing server for ${name} ${version}...`));
-  serverEnv = cfg;
-  console.log(chalk.green(`✔ Server environment ready for ${name} ${version}`));
+
+  try {
+    serverEnv = serverEnvSchema.parse(env);
+    console.log(chalk.green(`✔ Server environment ready for ${name} ${version}`));
+  } catch (err) {
+    console.error(chalk.red(`✘ Failed to validate server environment for ${name} ${version}`));
+    console.error(chalk.yellow('Details:'), err);
+    throw err;
+  }
 }
 
 /**
@@ -75,5 +75,5 @@ export function getServerConfig(): IServerEnvSchema {
       'Server environment has not been initialized. Call setupServer() at app startup.',
     );
   }
-  return serverEnv.server;
+  return serverEnv;
 }
