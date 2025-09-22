@@ -26,32 +26,38 @@ export const config = [
     },
   },
 
-  // --- SolidStart fences ---
+  // --- Client fences ---
   {
-    files: ['src/components/**/*.{ts,tsx}'],
+    files: [
+      '**/src/components/**/*.{ts,tsx}',
+      '**/src/routes/**/*.tsx',
+      '**/entry-client.{ts,tsx}',
+      '**/src/app.{ts,tsx}', // app.tsx is client
+    ],
     rules: {
-      'no-restricted-imports': ['error', { patterns: ['../server/*', 'src/server/*'] }],
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: ['**/server/*', '@**/server/*', 'packages/**/server/*'],
+        },
+      ],
     },
   },
+
+  // --- Server fences ---
   {
-    files: ['src/server/**/*.{ts,tsx}'],
+    files: [
+      '**/src/server/**/*.{ts,tsx}',
+      '**/src/routes/**/*.ts', // handlers
+      '**/entry-server.{ts,tsx}',
+    ],
     rules: {
-      'no-restricted-imports': ['error', { patterns: ['../components/*', 'src/components/*'] }],
-    },
-  },
-  {
-    // Route components (.tsx) → client, forbid server imports
-    files: ['src/routes/**/*.tsx'],
-    rules: {
-      'no-restricted-imports': ['error', { patterns: ['../server/*', 'src/server/*'] }],
-    },
-  },
-  {
-    // Route handlers (.ts) → server, forbid client imports
-    files: ['src/routes/**/*.ts'],
-    excludedFiles: ['src/routes/**/*.tsx'],
-    rules: {
-      'no-restricted-imports': ['error', { patterns: ['../components/*', 'src/components/*'] }],
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: ['**/components/*', '@**/components/*', 'packages/**/components/*'],
+        },
+      ],
     },
   },
 ];
