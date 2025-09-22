@@ -27,9 +27,6 @@ importers:
       '@safeoutput/lib':
         specifier: workspace:*
         version: link:../../packages/lib
-      '@safeoutput/tailwind-preset':
-        specifier: workspace:*
-        version: link:../../packages/tailwind-preset
       '@safeoutput/ui':
         specifier: workspace:*
         version: link:../../packages/ui
