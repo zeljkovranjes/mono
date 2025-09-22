@@ -50,4 +50,28 @@ export const config = [
       ],
     },
   },
+
+  {
+    files: [
+      '**/tailwind.config.cjs',
+      '**/postcss.config.cjs',
+      '**/vite.config.cjs',
+      '**/*.config.cjs',
+    ],
+    plugins: {
+      '@typescript-eslint': tseslint.plugin,
+    },
+    languageOptions: {
+      sourceType: 'commonjs',
+      globals: {
+        module: 'readonly',
+        require: 'readonly',
+        __dirname: 'readonly',
+      },
+    },
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+      'no-undef': 'off',
+    },
+  },
 ];

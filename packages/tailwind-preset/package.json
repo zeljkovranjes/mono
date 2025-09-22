@@ -1,0 +1,16 @@
+{
+  "name": "@safeoutput/tailwind-preset",
+  "version": "0.0.0",
+  "main": "index.js",
+  "files": [
+    "index.ts"
+  ],
+  "type": "module",
+  "peerDependencies": {
+    "tailwindcss": ">=3.0.0 || >=4.0.0 || insiders",
+    "tailwindcss-animate": ">=1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
+}

@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "exports": {
-    "./*": "./src/*.tsx"
+    "./components/*": "./src/components/*.tsx",
+    "./app.css": "./src/app.css"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
@@ -18,6 +19,14 @@
     "typescript": "5.9.2"
   },
   "dependencies": {
-    "solid-js": "^1.9.9"
+    "@kobalte/core": "^0.13.11",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "solid-js": "^1.9.9",
+    "tailwind-merge": "^3.3.1"
+  },
+  "peerDependencies": {
+    "tailwindcss": ">=3.0.0 || >=4.0.0 || insiders",
+    "tailwindcss-animate": ">=1.0.0"
   }
 }
