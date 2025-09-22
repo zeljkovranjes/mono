@@ -39,6 +39,7 @@
     }
   },
   "dependencies": {
+    "@ory/client": "^1.22.2",
     "dotenv": "^17.2.2",
     "zod": "^4.1.11"
   }
