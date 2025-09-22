@@ -13,12 +13,17 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
-        destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-        outline: 'border border-input hover:bg-accent hover:text-accent-foreground',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        ghost: 'hover:bg-accent hover:text-accent-foreground',
-        link: 'text-primary underline-offset-4 hover:underline',
+        default:
+          'relative bg-primary text-primary-foreground hover:bg-primary/90 border border-blue-800 shadow-button pressed:bg-primary-active pressed:border-blue-900 pressed:shadow-inset-t-black-100 disabled:bg-orange-500 disabled:border-orange-600 disabled:text-gray-100',
+        destructive:
+          'relative bg-destructive text-destructive-foreground hover:bg-destructive/90 border border-red-800 shadow-button pressed:bg-destructive/80 pressed:border-red-900 pressed:shadow-inset-t-black-100 disabled:opacity-60',
+        outline:
+          'relative border border-input hover:bg-accent hover:text-accent-foreground shadow-sm pressed:shadow-inset-t-black-100 disabled:opacity-60',
+        secondary:
+          'relative bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-gray-400 shadow-button pressed:bg-secondary/70 pressed:border-gray-500 pressed:shadow-inset-t-black-100 disabled:opacity-60',
+        ghost:
+          'relative hover:bg-accent hover:text-accent-foreground pressed:shadow-inset-t-black-100 disabled:opacity-60',
+        link: 'relative text-primary underline-offset-4 hover:underline pressed:text-primary/80 disabled:opacity-60',
       },
       size: {
         default: 'h-10 px-4 py-2',
