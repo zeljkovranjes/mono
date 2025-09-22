@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from '@safeoutput/ui/components/card';
 import { LabeledSeparator } from '@safeoutput/ui/components/separator';
+import { Callout, CalloutContent } from '@safeoutput/ui/components/callout';
 import { TextField, TextFieldInput, TextFieldLabel } from '@safeoutput/ui/components/text-field';
 import { Skeleton } from '@safeoutput/ui/components/skeleton';
 import { getPlatformBullet } from '~/utils/display';
@@ -48,6 +49,15 @@ export default function Login() {
     // @ts-ignore
     const node = flow.ui.nodes.find((n) => n.attributes?.name === 'csrf_token');
     return (node?.attributes as any)?.value || '';
+  };
+
+  // Extract flow-level error messages from Ory
+  const getFlowError = (): string | null => {
+    const flow = loginFlow();
+    if (!flow?.ui?.messages) return null;
+
+    const errorMessage = flow.ui.messages.find((msg) => msg.type === 'error');
+    return errorMessage?.text || null;
   };
 
   // Add the OIDC hook after getCsrfToken is defined
@@ -97,13 +107,17 @@ export default function Login() {
     const msg = field?.messages?.find((m) => m.type === 'error');
     return msg?.text || null;
   };
+
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
 
     const flow = loginFlow();
     if (!flow || isSubmitting()) return;
+
     try {
       setIsSubmitting(true);
+      setError(null); // Clear any previous errors
+
       const { data } = await frontend.updateLoginFlow({
         flow: flow.id,
         updateLoginFlowBody: {
@@ -118,8 +132,17 @@ export default function Login() {
       console.error('Login error:', err);
 
       if (err.response?.status === 400 && err.response?.data) {
+        // Update the flow with the error response
         setLoginFlow(err.response.data);
         extractProviders();
+
+        // Extract and display flow-level errors (like invalid credentials)
+        const flowError = getFlowError();
+        if (flowError) {
+          setError(flowError);
+        } else {
+          setError('Invalid email or password. Please try again.');
+        }
       } else if (err.response?.status === 422) {
         await initialize();
       } else {
@@ -185,7 +208,9 @@ export default function Login() {
         </CardHeader>
         <CardContent class="flex flex-col gap-5">
           <Show when={error()}>
-            <div class="text-red-600 text-sm bg-red-50 p-3 rounded">{error()}</div>
+            <Callout variant="error">
+              <CalloutContent>{error()}</CalloutContent>
+            </Callout>
           </Show>
           <OidcProvider
             flow={loginFlow}
