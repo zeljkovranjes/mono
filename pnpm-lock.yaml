@@ -113,6 +113,9 @@ importers:
 
   packages/lib:
     dependencies:
+      dotenv:
+        specifier: ^17.2.2
+        version: 17.2.2
       kysely:
         specifier: ^0.28.7
         version: 0.28.7
