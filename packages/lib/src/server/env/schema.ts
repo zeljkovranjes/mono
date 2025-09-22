@@ -31,7 +31,7 @@ export const serverEnvSchema = z.object({
 
   // ── App URLs (Client & Services) ────────────────────────────────────
   VITE_ROOT_DOMAIN: z.url(),
-  VITE_ORY_SDK_URL: z.url(),
+  VITE_ORY_SDK_URL: z.url().optional(),
 
   // Optional overrides
   VITE_KRATOS_PUBLIC_URL: z.url().optional(),
