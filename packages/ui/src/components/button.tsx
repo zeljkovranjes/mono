@@ -1,5 +1,5 @@
 import type { JSX, ValidComponent } from 'solid-js';
-import { splitProps } from 'solid-js';
+import { splitProps, Show } from 'solid-js';
 
 import * as ButtonPrimitive from '@kobalte/core/button';
 import type { PolymorphicProps } from '@kobalte/core/polymorphic';
@@ -14,7 +14,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-primary text-primary-foreground hover:bg-primary/90 border border-blue-800 shadow-button pressed:bg-primary-active pressed:border-blue-900 pressed:shadow-inset-t-black-100 disabled:bg-orange-500 disabled:border-orange-600 disabled:text-gray-100',
+          'bg-primary text-primary-foreground hover:bg-primary/90 border border-blue-800 shadow-button pressed:bg-primary-active pressed:border-blue-900 pressed:shadow-inset-t-black-100 disabled:opacity-60 disabled:border-blue-600 disabled:text-gray-100',
         destructive:
           'bg-destructive text-destructive-foreground hover:bg-destructive/90 border border-red-800 shadow-button pressed:bg-destructive/80 pressed:border-red-900 pressed:shadow-inset-t-black-100 disabled:opacity-60',
         outline:
@@ -40,17 +40,52 @@ const buttonVariants = cva(
 );
 
 type ButtonProps<T extends ValidComponent = 'button'> = ButtonPrimitive.ButtonRootProps<T> &
-  VariantProps<typeof buttonVariants> & { class?: string | undefined; children?: JSX.Element };
+  VariantProps<typeof buttonVariants> & {
+    class?: string | undefined;
+    children?: JSX.Element;
+    loading?: boolean;
+    loadingText?: JSX.Element;
+    icon?: JSX.Element;
+    iconAlign?: 'left' | 'right';
+  };
 
 const Button = <T extends ValidComponent = 'button'>(
   props: PolymorphicProps<T, ButtonProps<T>>,
 ) => {
-  const [local, others] = splitProps(props as ButtonProps, ['variant', 'size', 'class']);
+  const [local, others] = splitProps(props as ButtonProps, [
+    'variant',
+    'size',
+    'class',
+    'children',
+    'loading',
+    'loadingText',
+    'icon',
+    'iconAlign',
+  ]);
+
   return (
     <ButtonPrimitive.Root
       class={cn(buttonVariants({ variant: local.variant, size: local.size }), local.class)}
+      disabled={others.disabled || local.loading}
       {...others}
-    />
+    >
+      {/* Left icon or loader */}
+      <Show when={local.icon && local.iconAlign !== 'right' && !local.loading}>{local.icon}</Show>
+      <Show when={local.loading}>
+        {/* Replace this with your spinner */}
+        <span class="animate-spin size-4 border-2 border-current border-t-transparent rounded-full" />
+      </Show>
+
+      {/* Button content */}
+      <span>
+        <Show when={local.loading && local.loadingText} fallback={local.children}>
+          {local.loadingText}
+        </Show>
+      </span>
+
+      {/* Right icon */}
+      <Show when={local.icon && local.iconAlign === 'right' && !local.loading}>{local.icon}</Show>
+    </ButtonPrimitive.Root>
   );
 };
 
