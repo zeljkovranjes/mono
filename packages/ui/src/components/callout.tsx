@@ -7,7 +7,7 @@ import { cva } from 'class-variance-authority';
 import { cn } from '../utils';
 
 const calloutVariants = cva(
-  'rounded-md border-l-4 p-4 pl-6 shadow-sm transition-all duration-200',
+  'rounded-md border-l-2 p-4 pl-6 shadow-sm transition-all duration-200',
   {
     variants: {
       variant: {
