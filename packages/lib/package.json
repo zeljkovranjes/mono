@@ -4,9 +4,7 @@
   "private": true,
   "exports": {
     "./client/*": "./src/client/*.ts",
-    "./server/*": {
-      "node": "./src/server/*.ts"
-    }
+    "./server/*": "./src/server/*.ts"
   },
   "sideEffects": false,
   "browser": {
