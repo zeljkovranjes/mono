@@ -2,12 +2,12 @@
   "$schema": "https://solid-ui.com/schema.json",
   "tsx": true,
   "tailwind": {
-    "css": "src/app.css",
+    "css": "./src/app.css",
     "config": "../tailwind-preset/index.ts",
     "prefix": ""
   },
   "aliases": {
     "components": "src/components",
-    "utils": "../utils"
+    "utils": "~/utils"
   }
 }
