@@ -3,12 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "exports": {
-    "./client/*": {
-      "browser": "./src/client/*.ts"
-    },
-    "./server/*": {
-      "node": "./src/server/*.ts"
-    }
+    "./client/*": "./src/client/*.ts",
+    "./client/env/*": "./src/client/env/*.ts",
+    "./server/*": "./src/server/*.ts"
   },
   "browser": {
     "fs": false,
