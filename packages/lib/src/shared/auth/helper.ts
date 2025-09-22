@@ -55,6 +55,7 @@ export function getUrlForFlow(
  *
  * @returns A URL for initiating 2FA, or null if not required
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function maybeInitiate2FA(apiBaseUrl: string, currentUrl: string, err: any): string | null {
   if (err?.response?.status === 403) {
     return getUrlForFlow(
