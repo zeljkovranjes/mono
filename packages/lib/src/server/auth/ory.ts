@@ -50,7 +50,7 @@ export function getOryOAuth2() {
  * Create an Ory Keto Permissions API client.
  *
  * Typical usage:
- * - Checking fine-grained access control (ACL) permissions
+ * - Checking fine-grained access control permissions
  *
  * @returns A configured instance of `PermissionApi`.
  */
