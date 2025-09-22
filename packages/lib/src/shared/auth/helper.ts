@@ -1,3 +1,4 @@
+import { FrontendApi, Configuration } from '@ory/client';
 import { getClientConfig } from '../../client/env/runtime';
 import { getServerConfig } from '../../server/env/runtime';
 
@@ -31,41 +32,57 @@ export function getOryBaseUrl(): string {
  * @param flowType - The type of flow (e.g. "login", "registration", "settings")
  * @param params - Optional query parameters
  *
- * @returns The flow of the desired url.
+ * @returns The flow URL.
  */
-export const getUrlForFlow = (
+export function getUrlForFlow(
   apiBaseUrl: string,
   flowType: string,
   params?: URLSearchParams,
-): string => {
+): string {
   const url = new URL(`${apiBaseUrl}/self-service/${flowType}/browser`);
   if (params) {
     params.forEach((value, key) => url.searchParams.set(key, value));
   }
   return url.toString();
-};
+}
 
 /**
  * Handle a 403 error from Ory by redirecting to a 2FA (AAL2) login flow.
  *
  * @param apiBaseUrl - The Ory API base URL
  * @param currentUrl - The current page URL (used for return_to)
- * @returns A function that inspects an error and returns either:
- *          - a URL for initiating 2FA, or
- *          - null if the error does not require 2FA
+ * @param err - The error to inspect
+ *
+ * @returns A URL for initiating 2FA, or null if not required
  */
-export const maybeInitiate2FA = (apiBaseUrl: string, currentUrl: string) => (err: any) => {
-  // 403 means we need to request 2FA
-  if (err.response && err.response.status === 403) {
-    const return_to = currentUrl;
+export function maybeInitiate2FA(apiBaseUrl: string, currentUrl: string, err: any): string | null {
+  if (err?.response?.status === 403) {
     return getUrlForFlow(
       apiBaseUrl,
       'login',
       new URLSearchParams({
         aal: 'aal2',
-        return_to,
+        return_to: currentUrl,
       }),
     );
   }
   return null;
-};
+}
+
+/**
+ * Create an Ory Frontend API client for browser-side interactions.
+ *
+ * Typical usage:
+ * - Starting self-service flows (login, registration, recovery, settings)
+ * - Handling browser-based authentication and session management
+ *
+ * @returns A configured instance of `FrontendApi` for communicating with Ory.
+ */
+export function getOryFrontend() {
+  return new FrontendApi(
+    new Configuration({
+      basePath: getOryBaseUrl(),
+      baseOptions: { withCredentials: true },
+    }),
+  );
+}
