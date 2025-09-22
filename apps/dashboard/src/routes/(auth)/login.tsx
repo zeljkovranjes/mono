@@ -4,6 +4,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@safeoutput/ui/components/card';
@@ -273,6 +274,9 @@ export default function Login() {
             </Button>
           </form>
         </CardContent>
+        <CardFooter class="p-0">
+          <Button variant="link">Forgot password?</Button>
+        </CardFooter>
       </Card>
     </Show>
   );
