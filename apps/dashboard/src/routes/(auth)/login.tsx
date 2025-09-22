@@ -9,7 +9,12 @@ import {
 } from '@safeoutput/ui/components/card';
 import { LabeledSeparator } from '@safeoutput/ui/components/separator';
 import { Callout, CalloutContent } from '@safeoutput/ui/components/callout';
-import { TextField, TextFieldInput, TextFieldLabel } from '@safeoutput/ui/components/text-field';
+import {
+  TextField,
+  TextFieldErrorMessage,
+  TextFieldInput,
+  TextFieldLabel,
+} from '@safeoutput/ui/components/text-field';
 import { Skeleton } from '@safeoutput/ui/components/skeleton';
 import { getPlatformBullet } from '~/utils/display';
 import { LoginFlow } from '@ory/client';
@@ -51,7 +56,6 @@ export default function Login() {
     return (node?.attributes as any)?.value || '';
   };
 
-  // Extract flow-level error messages from Ory
   const getFlowError = (): string | null => {
     const flow = loginFlow();
     if (!flow?.ui?.messages) return null;
@@ -60,7 +64,6 @@ export default function Login() {
     return errorMessage?.text || null;
   };
 
-  // Add the OIDC hook after getCsrfToken is defined
   const { oidcProviders, isOidcLoading, handleOidcLogin, extractProviders } = useOidc(
     loginFlow,
     getCsrfToken,
@@ -91,7 +94,6 @@ export default function Login() {
       }
 
       setLoginFlow(flow);
-      // Extract OIDC providers after setting the flow
       extractProviders();
     } catch (err: any) {
       console.error('Failed to init login flow', err);
@@ -108,17 +110,25 @@ export default function Login() {
     return msg?.text || null;
   };
 
+  const clearForm = () => {
+    setEmail('');
+    setPassword('');
+  };
+
+  const clearError = () => {
+    setError(null);
+  };
+
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
-
     const flow = loginFlow();
     if (!flow || isSubmitting()) return;
 
     try {
       setIsSubmitting(true);
-      setError(null); // Clear any previous errors
+      setError(null);
 
-      const { data } = await frontend.updateLoginFlow({
+      await frontend.updateLoginFlow({
         flow: flow.id,
         updateLoginFlowBody: {
           method: 'password',
@@ -127,27 +137,25 @@ export default function Login() {
           csrf_token: getCsrfToken(),
         },
       });
-      window.location.href = '/dashboard';
+
+      clearForm();
+      setTimeout(() => (window.location.href = '/dashboard'), 100);
     } catch (err: any) {
       console.error('Login error:', err);
 
+      clearForm();
+
       if (err.response?.status === 400 && err.response?.data) {
-        // Update the flow with the error response
         setLoginFlow(err.response.data);
         extractProviders();
-
-        // Extract and display flow-level errors (like invalid credentials)
-        const flowError = getFlowError();
-        if (flowError) {
-          setError(flowError);
-        } else {
-          setError('Invalid email or password. Please try again.');
-        }
+        setError(getFlowError() || 'Invalid email or password. Please try again.');
       } else if (err.response?.status === 422) {
         await initialize();
       } else {
         setError('Login failed. Please try again.');
       }
+
+      await Promise.resolve();
     } finally {
       setIsSubmitting(false);
     }
@@ -228,11 +236,15 @@ export default function Login() {
                 type="email"
                 placeholder="example@domain.com"
                 value={email()}
-                onInput={(e) => setEmail(e.currentTarget.value)}
+                autocomplete={'email'}
+                onInput={(e) => {
+                  setEmail(e.currentTarget.value);
+                  if (error()) clearError();
+                }}
                 required
               />
               <Show when={getFieldError('identifier')}>
-                <div class="text-red-600 text-xs mt-1">{getFieldError('identifier')}</div>
+                <TextFieldErrorMessage>{getFieldError('identifier')}</TextFieldErrorMessage>
               </Show>
             </TextField>
             <TextField>
@@ -241,14 +253,22 @@ export default function Login() {
                 type="password"
                 placeholder={getPlatformBullet().repeat(12)}
                 value={password()}
-                onInput={(e) => setPassword(e.currentTarget.value)}
+                autocomplete={'current-password'}
+                onInput={(e) => {
+                  setPassword(e.currentTarget.value);
+                  if (error()) clearError();
+                }}
                 required
               />
               <Show when={getFieldError('password')}>
-                <div class="text-red-600 text-xs mt-1">{getFieldError('password')}</div>
+                <TextFieldErrorMessage>{getFieldError('password')}</TextFieldErrorMessage>
               </Show>
             </TextField>
-            <Button type="submit" disabled={isSubmitting() || !email() || !password()}>
+            <Button
+              type="submit"
+              loading={isSubmitting()}
+              disabled={isSubmitting() || !email() || !password()}
+            >
               {isSubmitting() ? 'Logging in...' : 'Log in to account'}
             </Button>
           </form>
