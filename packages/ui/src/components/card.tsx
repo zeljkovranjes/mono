@@ -21,7 +21,7 @@ const CardHeader: Component<ComponentProps<'div'>> = (props) => {
 const CardTitle: Component<ComponentProps<'h3'>> = (props) => {
   const [local, others] = splitProps(props, ['class']);
   return (
-    <h3 class={cn('text-md font-medium leading-none tracking-tight', local.class)} {...others} />
+    <h3 class={cn('text-xl font-medium leading-none tracking-tight', local.class)} {...others} />
   );
 };
 
