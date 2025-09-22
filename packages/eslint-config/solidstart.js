@@ -26,25 +26,21 @@ export const config = [
     },
   },
 
-  // --- Client fences ---
   {
     files: [
       '**/src/components/**/*.{ts,tsx}',
       '**/src/routes/**/*.tsx',
       '**/entry-client.{ts,tsx}',
-      '**/src/app.{ts,tsx}', // app.tsx is client
+      '**/src/app.{ts,tsx}',
     ],
     rules: {
       'no-restricted-imports': [
         'error',
         {
           patterns: [
-            // forbid server imports
             '**/server/*',
             '@**/server/*',
             'packages/**/server/*',
-
-            // forbid shared server helpers
             '**/shared/**/server',
             '**/shared/**/server.*',
           ],
@@ -53,24 +49,16 @@ export const config = [
     },
   },
 
-  // --- Server fences ---
   {
-    files: [
-      '**/src/server/**/*.{ts,tsx}',
-      '**/src/routes/**/*.ts', // handlers only
-      '**/entry-server.{ts,tsx}',
-    ],
+    files: ['**/src/server/**/*.{ts,tsx}', '**/src/routes/**/*.ts', '**/entry-server.{ts,tsx}'],
     rules: {
       'no-restricted-imports': [
         'error',
         {
           patterns: [
-            // forbid client imports
             '**/components/*',
             '@**/components/*',
             'packages/**/components/*',
-
-            // forbid shared client helpers
             '**/shared/**/client',
             '**/shared/**/client.*',
           ],
