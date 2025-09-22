@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      chalk:
+        specifier: ^5.6.2
+        version: 5.6.2
     devDependencies:
       prettier:
         specifier: ^3.6.2
@@ -20,6 +24,9 @@ importers:
 
   apps/dashboard:
     dependencies:
+      '@safeoutput/lib':
+        specifier: workspace:*
+        version: link:../../packages/lib
       '@safeoutput/ui':
         specifier: workspace:*
         version: link:../../packages/ui
