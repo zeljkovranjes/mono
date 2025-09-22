@@ -69,11 +69,11 @@ export function parse(env: Record<string, unknown>): IServerEnvSchema {
  *           `@safeoutput/lib`. Consumers of the library should not call
  *           it directly.
  */
-export function getServerConfig(): ServerEnv {
+export function getServerConfig(): IServerEnvSchema {
   if (!serverEnv) {
     throw new Error(
       'Server environment has not been initialized. Call setupServer() at app startup.',
     );
   }
-  return serverEnv;
+  return serverEnv.server;
 }
