@@ -25,7 +25,7 @@ export function setupServer(env: Record<string, unknown>) {
   console.log(chalk.gray(`→ Initializing server for ${name} ${version}...`));
 
   try {
-    serverEnv = serverEnvSchema.parse(env);
+    serverEnv = parse(env);
     console.log(chalk.green(`✔ Server environment ready for ${name} ${version}`));
   } catch (err) {
     console.error(chalk.red(`✘ Failed to validate server environment for ${name} ${version}`));
@@ -44,10 +44,10 @@ export function setupServer(env: Record<string, unknown>) {
  * Example:
  * ```ts
  * const cfg = parseServerEnv(process.env);
- * setupServer({ server: cfg });
+ * setupServer(cfg);
  * ```
  */
-export function parse(env: Record<string, unknown>): IServerEnvSchema {
+function parse(env: Record<string, unknown>): IServerEnvSchema {
   const name = chalk.underline(pkg.name);
   const version = chalk.dim(`v${pkg.version}`);
 
