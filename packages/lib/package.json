@@ -9,7 +9,8 @@
   "browser": {
     "fs": false,
     "path": false,
-    "crypto": false
+    "crypto": false,
+    "./src/server/*": false
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
