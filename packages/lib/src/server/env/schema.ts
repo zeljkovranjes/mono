@@ -24,10 +24,21 @@ export const serverEnvSchema = z.object({
   STRIPE_WEBHOOK_SECRET: z.string().min(1),
 
   // ── Database (Postgres) ─────────────────────────────────────────────
-  POSTGRES_DATABASE_URL: z.string().url(),
+  POSTGRES_DATABASE_URL: z.url(),
 
   // ── Telemetry (OpenTelemetry) ───────────────────────────────────────
-  OTEL_EXPORTER_URL: z.string().url().optional(),
+  OTEL_EXPORTER_URL: z.url().optional(),
+
+  // ── App URLs (Client & Services) ────────────────────────────────────
+  VITE_ROOT_DOMAIN: z.url(),
+  VITE_ORY_SDK_URL: z.url(),
+
+  // Optional overrides
+  VITE_KRATOS_PUBLIC_URL: z.url().optional(),
+  VITE_KRATOS_BROWSER_URL: z.url().optional(),
+  VITE_KRATOS_ADMIN_URL: z.url().optional(),
+  VITE_HYDRA_ADMIN_URL: z.url().optional(),
+  VITE_KETO_PUBLIC_URL: z.url().optional(),
 });
 
 export type IServerEnvSchema = z.infer<typeof serverEnvSchema>;
