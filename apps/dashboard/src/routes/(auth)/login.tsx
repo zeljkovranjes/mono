@@ -168,7 +168,7 @@ export default function Login() {
 
   const LoadingSkeleton = () => (
     <Card class="w-[384px] max-w-[384px]">
-      <CardHeader class="pb-0">
+      <CardHeader class="pb-0 flex flex-col gap-1">
         <CardTitle>
           <Skeleton height={32} width={80} radius={6} />
         </CardTitle>
