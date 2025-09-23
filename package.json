@@ -20,8 +20,5 @@
   "workspaces": [
     "apps/*",
     "pacakges/* "
-  ],
-  "dependencies": {
-    "chalk": "^5.6.2"
-  }
+  ]
 }
