@@ -65,7 +65,7 @@ const TextFieldInput = <T extends ValidComponent = 'input'>(
 
   /** Base input classes */
   const baseInput =
-    'flex h-10 w-full rounded-sm border border-input bg-transparent text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[invalid]:border-error-foreground data-[invalid]:text-error-foreground';
+    'flex h-10 w-full rounded-sm border border-input bg-gray-50 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[invalid]:border-error-foreground data-[invalid]:text-error-foreground';
 
   /** Padding adjustments depending on icon / toggle */
   const padLeftForIcon = local.icon && local.iconAlign === 'left' ? 'pl-10' : 'pl-3';
