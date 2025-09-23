@@ -167,10 +167,10 @@ export default function Login() {
   });
 
   const LoadingSkeleton = () => (
-    <Card class="w-[384px] max-w-[384px]">
+    <Card class="w-[384px] max-w-[384px] max-h-[466px]">
       <CardHeader class="pb-0 flex flex-col gap-1">
         <CardTitle>
-          <Skeleton height={32} width={80} radius={6} />
+          <Skeleton height={20} width={80} radius={6} />
         </CardTitle>
         <CardDescription class="flex gap-1 items-center">
           <Skeleton height={20} width={150} radius={4} />
@@ -198,9 +198,9 @@ export default function Login() {
           <Skeleton height={16} width={70} radius={4} />
           <Skeleton height={40} width={336} radius={6} />
         </div>
-        <Skeleton height={40} width={336} radius={6} />
+        <Skeleton height={38} width={336} radius={6} />
       </CardContent>
-      <CardFooter class="">
+      <CardFooter class="relative bottom-5">
         <Skeleton height={20} width={150} radius={4} />
       </CardFooter>
     </Card>
