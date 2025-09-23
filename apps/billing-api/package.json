@@ -1,0 +1,26 @@
+{
+  "name": "billing-api",
+  "version": "1.0.0",
+  "description": "handles billing/checkouts via stripe",
+  "private": true,
+  "main": ".output/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "rimraf .output && tsc -p tsconfig.json",
+    "start": "node .output/server.js"
+  },
+  "dependencies": {
+    "chalk": "^5.6.2",
+    "fastify": "^5.6.0",
+    "fastify-plugin": "^5.0.1",
+    "stripe": "^18.5.0"
+  },
+  "devDependencies": {
+    "@safeoutput/eslint-config": "workspace:*",
+    "@safeoutput/typescript-config": "workspace:*",
+    "@types/node": "^24.5.2",
+    "rimraf": "^6.0.1",
+    "tsx": "^4.20.5",
+    "typescript": "~5.9.2"
+  }
+}
