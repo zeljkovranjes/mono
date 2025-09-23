@@ -2,8 +2,18 @@ import Fastify from 'fastify';
 
 const fastify = Fastify({
   logger: true,
+  ajv: {
+    customOptions: {
+      coerceTypes: 'array',
+      removeAdditional: 'all',
+    },
+  },
 });
 
+async function init() {}
+
+init();
+/*
 fastify.get('/', async function handler(request, reply) {
   return { some_variable: 'some value of variable' };
 });
@@ -23,3 +33,4 @@ async function start() {
 }
 
 start();
+*/
