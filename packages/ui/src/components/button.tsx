@@ -14,13 +14,13 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-primary text-primary-foreground hover:bg-primary/90 border border-blue-800 shadow-button pressed:bg-primary-active pressed:border-blue-900 pressed:shadow-inset-t-black-100 disabled:opacity-60 disabled:border-blue-600 disabled:text-gray-100',
+          'bg-primary text-primary-foreground hover:bg-primary/90 border border-blue-800 shadow-xs pressed:bg-primary-active pressed:border-blue-900 pressed:shadow-inset-t-black-100 disabled:opacity-60 disabled:border-blue-600 disabled:text-gray-100',
         destructive:
-          'bg-destructive text-destructive-foreground hover:bg-destructive/90 border border-red-800 shadow-button pressed:bg-destructive/80 pressed:border-red-900 pressed:shadow-inset-t-black-100 disabled:opacity-60',
+          'bg-destructive text-destructive-foreground hover:bg-destructive/90 border border-red-800 shadow-xs pressed:bg-destructive/80 pressed:border-red-900 pressed:shadow-inset-t-black-100 disabled:opacity-60',
         outline:
-          'border border-input hover:bg-accent hover:text-accent-foreground shadow-sm pressed:shadow-inset-t-black-100 disabled:opacity-60',
+          'border border-input hover:bg-accent hover:text-accent-foreground shadow-xs pressed:shadow-inset-t-black-100 disabled:opacity-60',
         secondary:
-          'bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-gray-400 shadow-button pressed:bg-secondary/70 pressed:border-gray-500 pressed:shadow-inset-t-black-100 disabled:opacity-60',
+          'bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-gray-400 shadow-xs pressed:bg-secondary/70 pressed:border-gray-500 pressed:shadow-inset-t-black-100 disabled:opacity-60',
         ghost:
           'hover:bg-accent hover:text-accent-foreground pressed:shadow-inset-t-black-100 disabled:opacity-60',
         link: 'text-primary underline-offset-4 hover:underline pressed:text-primary/80 disabled:opacity-60',
