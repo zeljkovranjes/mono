@@ -237,7 +237,7 @@ export default function SignUp() {
   });
 
   const LoadingSkeleton = () => (
-    <Card class="w-[384px] max-w-[384px] max-h-[510px]">
+    <Card class="w-[384px] max-w-[384px] max-h-[525px]">
       <CardHeader class="pb-0 flex flex-col gap-1">
         <CardTitle>
           <Skeleton height={20} width={80} radius={6} />
@@ -284,7 +284,7 @@ export default function SignUp() {
           <CardTitle>Sign up</CardTitle>
           <CardDescription class="flex gap-1 items-center">
             Already have an account?
-            <Button variant="link" class="p-0">
+            <Button variant="link" class="p-0" onClick={() => (window.location.href = '/login')}>
               Log in
             </Button>
           </CardDescription>

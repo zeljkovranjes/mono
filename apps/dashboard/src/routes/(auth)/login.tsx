@@ -269,7 +269,7 @@ export default function Login() {
           <CardTitle>Log in</CardTitle>
           <CardDescription class="flex gap-1 items-center">
             New to Safeoutput?
-            <Button variant="link" class="p-0">
+            <Button variant="link" class="p-0" onClick={() => (window.location.href = '/signup')}>
               Sign up
             </Button>
           </CardDescription>
