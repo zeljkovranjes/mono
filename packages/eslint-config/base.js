@@ -50,7 +50,24 @@ export const config = [
       ],
     },
   },
+  {
+    files: ['apps/*-api/**/*.{ts,tsx,js,jsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            '**/client/*',
+            '../client/*',
+            '../../client/*',
 
+            '**/shared/**/client',
+            '**/shared/**/client.*',
+          ],
+        },
+      ],
+    },
+  },
   {
     files: [
       '**/tailwind.config.cjs',
