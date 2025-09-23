@@ -1,4 +1,5 @@
 import type { ValidComponent } from 'solid-js';
+import { createSignal } from 'solid-js';
 import { mergeProps, splitProps } from 'solid-js';
 
 import type { PolymorphicProps } from '@kobalte/core';
@@ -52,6 +53,37 @@ const TextFieldInput = <T extends ValidComponent = 'input'>(
 ) => {
   const props = mergeProps<TextFieldInputProps<T>[]>({ type: 'text' }, rawProps);
   const [local, others] = splitProps(props as TextFieldInputProps, ['type', 'class']);
+
+  // When type is password, render a show/hide toggle with text (not an icon)
+  if (local.type === 'password') {
+    const [shown, setShown] = createSignal(false);
+
+    return (
+      <div class="relative">
+        <TextFieldPrimitive.Input
+          // swap the actual input type between password/text
+          type={shown() ? 'text' : 'password'}
+          class={cn(
+            // add right padding so the text button doesn't overlap
+            'flex h-10 w-full rounded-sm border border-input bg-transparent px-3 pr-16 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[invalid]:border-error-foreground data-[invalid]:text-error-foreground',
+            local.class,
+          )}
+          {...(others as any)}
+        />
+        <button
+          type="button"
+          class="absolute inset-y-0 right-2 my-auto h-7 rounded-sm px-2 text-xs font-medium underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          aria-pressed={shown()}
+          aria-label={shown() ? 'Hide password' : 'Show password'}
+          onClick={() => setShown((v) => !v)}
+        >
+          {shown() ? 'Hide' : 'Show'}
+        </button>
+      </div>
+    );
+  }
+
+  // Default (non-password) input
   return (
     <TextFieldPrimitive.Input
       type={local.type}
@@ -59,7 +91,7 @@ const TextFieldInput = <T extends ValidComponent = 'input'>(
         'flex h-10 w-full rounded-sm border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[invalid]:border-error-foreground data-[invalid]:text-error-foreground',
         local.class,
       )}
-      {...others}
+      {...(others as any)}
     />
   );
 };
