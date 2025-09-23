@@ -21,6 +21,7 @@ import { getPlatformBullet } from '~/utils/display';
 import { LoginFlow } from '@ory/client';
 import { getOryFrontend } from '@safeoutput/lib/shared/auth/ory';
 import OidcProvider, { useOidc } from '~/components/reusable/oidcProvider';
+import chalk from 'chalk';
 
 let frontend = getOryFrontend();
 
@@ -62,7 +63,27 @@ export default function Login() {
     if (!flow?.ui?.messages) return null;
 
     const errorMessage = flow.ui.messages.find((msg) => msg.type === 'error');
-    return errorMessage?.text || null;
+    if (errorMessage) return errorMessage.text;
+
+    // Check for field-level errors and make them more user-friendly
+    const nodes = flow.ui.nodes || [];
+    for (const node of nodes) {
+      if (node.messages && node.messages.length > 0) {
+        const fieldError = node.messages.find((msg) => msg.type === 'error');
+        if (fieldError) {
+          const fieldName = (node.attributes as any)?.name;
+          // Make error messages more user-friendly
+          if (fieldName === 'identifier') {
+            return `Email: ${fieldError.text}`;
+          } else if (fieldName === 'password') {
+            return `Password: ${fieldError.text}`;
+          }
+          return fieldError.text;
+        }
+      }
+    }
+
+    return null;
   };
 
   const { oidcProviders, isOidcLoading, handleOidcLogin, extractProviders } = useOidc(
@@ -72,6 +93,7 @@ export default function Login() {
   );
 
   const initialize = async () => {
+    console.log(chalk.gray(`→ Initializing Loginflow session...`));
     try {
       setIsInitializing(true);
       setError(null);
@@ -82,6 +104,9 @@ export default function Login() {
       if (flowId) {
         try {
           flow = await getExistingLoginFlow(flowId);
+          console.log(
+            chalk.green(`✔ Reused Loginflow session with flow id: ${chalk.underline(flowId)}`),
+          );
         } catch (err: any) {
           const status = err.response?.status;
           if (status === 404 || status === 403 || status === 410) {
@@ -92,12 +117,17 @@ export default function Login() {
         }
       } else {
         flow = await createNewLoginFlow();
+        console.log(
+          chalk.green(
+            `✔ Initialized Loginflow generated session with flow id: ${chalk.underline(flow.id)}`,
+          ),
+        );
       }
 
       setLoginFlow(flow);
       extractProviders();
     } catch (err: any) {
-      console.error('Failed to init login flow', err);
+      console.error(chalk.red(`✘ Failed to initialize Loginflow session with flow id: {${err}}`));
       setError('Failed to initialize login. Please refresh the page.');
     } finally {
       setIsInitializing(false);
@@ -108,7 +138,27 @@ export default function Login() {
     // @ts-ignore
     const field = loginFlow()?.ui?.nodes.find((n) => n.attributes?.name === name);
     const msg = field?.messages?.find((m) => m.type === 'error');
-    return msg?.text || null;
+
+    if (!msg) return null;
+
+    // Make error messages more user-friendly
+    const errorText = msg.text;
+
+    // Common validation error improvements
+    if (errorText.includes('required')) {
+      return 'This field is required';
+    }
+    if (errorText.includes('email') && errorText.includes('invalid')) {
+      return 'Please enter a valid email address';
+    }
+    if (errorText.includes('credentials') && errorText.includes('invalid')) {
+      return 'Invalid email or password';
+    }
+    if (errorText.includes('password') && errorText.includes('incorrect')) {
+      return 'Incorrect password';
+    }
+
+    return errorText;
   };
 
   const clearForm = () => {
@@ -149,7 +199,13 @@ export default function Login() {
       if (err.response?.status === 400 && err.response?.data) {
         setLoginFlow(err.response.data);
         extractProviders();
-        setError(getFlowError() || 'Invalid email or password. Please try again.');
+        const errorMsg = getFlowError();
+        if (errorMsg) {
+          setError(errorMsg);
+        } else {
+          // Fallback with more specific error based on likely causes
+          setError('Invalid email or password. Please check your credentials and try again.');
+        }
       } else if (err.response?.status === 422) {
         await initialize();
       } else {
@@ -234,7 +290,7 @@ export default function Login() {
           />
           <form onSubmit={handleSubmit} class="flex flex-col gap-5">
             <LabeledSeparator>OR</LabeledSeparator>
-            <TextField>
+            <TextField validationState={getFieldError('identifier') ? 'invalid' : 'valid'}>
               <TextFieldLabel>Email</TextFieldLabel>
               <TextFieldInput
                 type="email"
@@ -251,7 +307,7 @@ export default function Login() {
                 <TextFieldErrorMessage>{getFieldError('identifier')}</TextFieldErrorMessage>
               </Show>
             </TextField>
-            <TextField>
+            <TextField validationState={getFieldError('password') ? 'invalid' : 'valid'}>
               <TextFieldLabel>Password</TextFieldLabel>
               <TextFieldInput
                 type="password"
