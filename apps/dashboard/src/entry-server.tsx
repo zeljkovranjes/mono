@@ -1,6 +1,5 @@
 // @refresh reload
 import { setupServerEnvironment } from '@safeoutput/lib/server/env/runtime';
-import { serverEnvSchema } from '@safeoutput/lib/server/env/schema';
 setupServerEnvironment(process.env);
 import { createHandler, StartServer } from '@solidjs/start/server';
 
