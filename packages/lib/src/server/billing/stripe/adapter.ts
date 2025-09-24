@@ -1,37 +1,45 @@
 import Stripe from 'stripe';
-import { CustomerAdapter } from '../model';
+import { BillingCustomer, Customer } from '../model';
 import { createStripeCustomer, getStripeCustomer } from './customer';
 
 /**
- * Stripe implementation of the `CustomerAdapter` interface.
+ * @internal
  *
- * @internal Consumers of the library should **not** call this adapter directly, as it
- * tightly couples your code to Stripe's SDK types. Use the exported `billing`
- * abstraction instead.
- *
+ * Stripe implementation of BillingCustomer.
  */
-export const StripeAdapter: CustomerAdapter = {
-  async createCustomer<T = Stripe.Customer>(details: {
+export class StripeAdapter implements BillingCustomer {
+  async createCustomer(customer: {
+    name: string;
     email: string;
-    name?: string;
     metadata?: Record<string, string>;
-  }): Promise<T> {
-    const created = await createStripeCustomer({
-      email: details.email,
-      name: details.name,
-      metadata: details.metadata ?? {},
+  }): Promise<Customer> {
+    const stripeCustomer = await createStripeCustomer({
+      name: customer.name,
+      email: customer.email,
+      metadata: customer.metadata,
     });
 
-    return created as T;
-  },
+    return {
+      id: stripeCustomer.id,
+      name: stripeCustomer.name!,
+      email: stripeCustomer.email,
+      metadata: stripeCustomer.metadata ?? undefined,
+    };
+  }
 
-  async getCustomer<T = Stripe.Customer>(id: string): Promise<T | null> {
-    const found = await getStripeCustomer(id);
+  async getCustomer(id: string): Promise<Customer | null> {
+    const stripeCustomer = await getStripeCustomer(id);
+    if (!stripeCustomer) return null;
 
-    if (!found) {
-      return null;
-    }
+    return {
+      id: stripeCustomer.id,
+      name: stripeCustomer.name!,
+      email: stripeCustomer.email,
+      metadata: stripeCustomer.metadata ?? undefined,
+    };
+  }
 
-    return found as T;
-  },
-};
+  async getCustomerRaw<T>(id: string): Promise<T | null> {
+    return getStripeCustomer(id) as T | null;
+  }
+}

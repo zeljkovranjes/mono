@@ -23,7 +23,7 @@ import { getStripe } from './sdk';
 export async function createStripeCustomer(
   params: Stripe.CustomerCreateParams,
 ): Promise<Stripe.Customer> {
-  return getStripe().customers.create(params);
+  return await getStripe().customers.create(params);
 }
 
 /**
@@ -44,9 +44,7 @@ export async function createStripeCustomer(
  * }
  * ```
  */
-export async function getStripeCustomer(
-  id: string,
-): Promise<Stripe.Customer | Stripe.DeletedAccount | null> {
+export async function getStripeCustomer(id: string): Promise<Stripe.Customer | null> {
   const res = await getStripe().customers.retrieve(id);
   if ('deleted' in res && res.deleted) {
     return null;
