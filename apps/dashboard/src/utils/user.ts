@@ -7,17 +7,17 @@ import { UAParser } from 'ua-parser-js';
  * @returns {string} A compact string uniquely identifying the OS and browser.
  */
 export function getPlatform(): string {
-  var uap = UAParser(navigator.userAgent);
-  var osVersion = uap.os.version;
+  const uap = UAParser(navigator.userAgent);
+  let osVersion = uap.os.version;
   if (osVersion == null) {
     osVersion = '';
   }
-  var browserVersion = uap.browser.major;
+  let browserVersion = uap.browser.major;
   if (browserVersion == null) {
     browserVersion = '';
   }
 
-  var platform = uap.os.name + osVersion + '_' + uap.browser.name + browserVersion;
+  let platform = uap.os.name + osVersion + '_' + uap.browser.name + browserVersion;
   platform = platform.replace(/\s/g, '');
 
   return platform;
