@@ -12,12 +12,12 @@ let clientEnv: IClientEnvSchema | null = null;
  *
  * Example:
  * ```ts
- * setupClient({
+ * setupClientEnvironment({
  *   client: clientEnvSchema.parse(import.meta.env),
  * });
  * ```
  */
-export function setupClient(env: Record<string, unknown>) {
+export function setupClientEnvironment(env: Record<string, unknown>) {
   if (clientEnv) {
     return;
   }
