@@ -2,7 +2,8 @@
   "extends": "@safeoutput/typescript-config/base.json",
   "compilerOptions": {
     "jsx": "preserve",
-    "outDir": ".output"
+    "outDir": ".output",
+    "stripInternal": true
   },
   "include": ["src"],
   "exclude": ["node_modules", ".output"]
