@@ -2,6 +2,8 @@ import { setupServer } from '@safeoutput/lib/server/env/runtime';
 import { getLogger } from '@safeoutput/lib/server/logging/index';
 import closeWithGrace from 'close-with-grace';
 import Fastify from 'fastify';
+// initialize the environment for @safeoutput/lib
+setupServer();
 
 const app = Fastify({
   loggerInstance: getLogger(),
@@ -14,8 +16,6 @@ const app = Fastify({
 });
 
 async function init() {
-  setupServer();
-
   closeWithGrace({ delay: 500 }, async ({ err }) => {
     if (err != null) {
       app.log.error(err);
