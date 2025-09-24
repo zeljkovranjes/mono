@@ -1,6 +1,5 @@
 import Stripe from 'stripe';
 import { CustomerAdapter } from '../model';
-import { getStripe } from './sdk';
 import { createStripeCustomer, getStripeCustomer } from './customer';
 
 /**
