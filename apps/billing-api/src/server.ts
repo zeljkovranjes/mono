@@ -1,7 +1,9 @@
+import { getLogger } from '@safeoutput/lib/server/logging/index';
+import closeWithGrace from 'close-with-grace';
 import Fastify from 'fastify';
 
-const fastify = Fastify({
-  logger: true,
+const app = Fastify({
+  loggerInstance: getLogger(),
   ajv: {
     customOptions: {
       coerceTypes: 'array',
@@ -10,7 +12,21 @@ const fastify = Fastify({
   },
 });
 
-async function init() {}
+async function init() {
+  closeWithGrace({ delay: 500 }, async ({ err }) => {
+    if (err != null) {
+      app.log.error(err);
+    }
+    await app.close();
+  });
+
+  try {
+    await app.listen({ port: 3009 });
+  } catch (err) {
+    app.log.error(err);
+    process.exit(1);
+  }
+}
 
 init();
 /*
