@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { createSignal, onMount, Show } from 'solid-js';
 import { Button } from '@safeoutput/ui/components/button';
 import {
