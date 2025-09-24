@@ -2,9 +2,14 @@ import Stripe from 'stripe';
 import { CustomerAdapter } from '../model';
 import { getStripe } from './sdk';
 
-// todo add more logic to the functions
-// for example if it's formatted like a uuid
-// check the database and get customer id like that.
+/**
+ * Stripe implementation of the `CustomerAdapter` interface.
+ *
+ * @internal Consumers of the library should **not** call this adapter directly, as it
+ * tightly couples your code to Stripe's SDK types. Use the exported `billing`
+ * abstraction instead.
+ *
+ */
 export const StripeAdapter: CustomerAdapter = {
   createCustomer: async function <T = Stripe.Customer>(details: {
     email: string;
