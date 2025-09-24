@@ -19,7 +19,6 @@ function tryToLoadRootEnv(): string | null {
   const envPath = findUpSync('.env');
   if (envPath) {
     dotenv.config({ path: envPath });
-    logger.info(`Loaded environment file from ${envPath}`);
     return envPath;
   } else {
     logger.warn('No .env file found in parent directories');
@@ -53,12 +52,8 @@ export function setupServer(env?: Record<string, unknown>) {
 
   try {
     if (!env) {
-      const loaded = tryToLoadRootEnv();
-      if (loaded) {
-        logger.info(`Using process.env after loading .env from ${loaded}`);
-      } else {
-        logger.info('Using process.env without .env file');
-      }
+      logger.info(`No environment provided, attempting to load .env file from mono root`);
+      tryToLoadRootEnv();
       env = process.env;
     }
 
