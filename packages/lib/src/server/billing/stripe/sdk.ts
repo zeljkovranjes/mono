@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import { getServerConfig } from '../env/runtime';
+import { getServerConfig } from '../../env/runtime';
 
 let stripe: Stripe | null = null;
 let version: Stripe.LatestApiVersion = '2025-08-27.basil';
