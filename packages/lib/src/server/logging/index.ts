@@ -1,6 +1,15 @@
 import pino, { LoggerOptions, Logger } from 'pino';
 import { getServerConfig } from '../env/runtime';
 
+function getLogLevel(): string {
+  try {
+    return getServerConfig().LOG_LEVEL;
+  } catch (err) {
+    // prevent circular dependency.
+    return process.env.LOG_LEVEL || 'trace';
+  }
+}
+
 /**
  * Builds the logger configuration options for pino.
  *
@@ -13,9 +22,11 @@ import { getServerConfig } from '../env/runtime';
  * ```
  */
 export function getLoggerOptions(): LoggerOptions {
-  if (process.stdout.isTTY) {
+  const logLevel = getLogLevel();
+
+  if (process.stdout?.isTTY) {
     return {
-      level: getServerConfig().LOG_LEVEL,
+      level: logLevel,
       transport: {
         target: 'pino-pretty',
         options: {
@@ -27,7 +38,7 @@ export function getLoggerOptions(): LoggerOptions {
   }
 
   return {
-    level: getServerConfig().LOG_LEVEL,
+    level: logLevel,
   };
 }
 

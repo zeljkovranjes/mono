@@ -1,20 +1,47 @@
 import { serverEnvSchema, type IServerEnvSchema } from './schema';
 import pkg from '../../../package.json';
 import chalk from 'chalk';
+import { findUpSync } from 'find-up';
+import dotenv from 'dotenv';
+import { getLogger } from '../logging';
 
 let serverEnv: IServerEnvSchema | null = null;
+const logger = getLogger();
+
+/**
+ * Attempts to locate and load a `.env` file from the current directory
+ * or any parent directories, injecting its variables into `process.env`.
+ *
+ * @internal This helper is intended for internal bootstrap use when the
+ *           environment is not already configured.
+ */
+function tryToLoadRootEnv(): string | null {
+  const envPath = findUpSync('.env');
+  if (envPath) {
+    dotenv.config({ path: envPath });
+    logger.info(`Loaded environment file from ${envPath}`);
+    return envPath;
+  } else {
+    logger.warn('No .env file found in parent directories');
+    return null;
+  }
+}
 
 /**
  * Initializes the server environment for this package.
  *
- * @param env The environment source (e.g., process.env).
+ * If no `env` is provided, this function will attempt to load a `.env` file
+ * (via {@link tryToLoadRootEnv}) and then fall back to `process.env`.
+ *
+ * @param env The environment source (defaults to `process.env` if omitted).
  *
  * Example:
  * ```ts
- * setupServer(process.env);
+ * setupServer();               // auto-loads .env from the root and uses process.env
+ * setupServer(process.env);    // uses given env object directly
  * ```
  */
-export function setupServer(env: Record<string, unknown>) {
+export function setupServer(env?: Record<string, unknown>) {
   if (serverEnv) {
     return;
   }
@@ -22,42 +49,24 @@ export function setupServer(env: Record<string, unknown>) {
   const name = chalk.underline(pkg.name);
   const version = chalk.dim(`v${pkg.version}`);
 
-  console.log(chalk.gray(`→ Initializing server for ${name} ${version}...`));
+  logger.info(`Initializing server for ${name} ${version}...`);
 
   try {
-    serverEnv = parse(env);
-    console.log(chalk.green(`✔ Server environment ready for ${name} ${version}`));
-  } catch (err) {
-    console.error(chalk.red(`✘ Failed to validate server environment for ${name} ${version}`));
-    console.error(chalk.yellow('Details:'), err);
-    throw err;
-  }
-}
+    if (!env) {
+      const loaded = tryToLoadRootEnv();
+      if (loaded) {
+        logger.info(`Using process.env after loading .env from ${loaded}`);
+      } else {
+        logger.info('Using process.env without .env file');
+      }
+      env = process.env;
+    }
 
-/**
- * Safe wrapper for parsing the server environment schema.
- *
- * @param env The environment source (e.g., process.env).
- * @returns The validated server environment schema.
- * @throws Error if validation fails.
- *
- * Example:
- * ```ts
- * const cfg = parseServerEnv(process.env);
- * setupServer(cfg);
- * ```
- */
-function parse(env: Record<string, unknown>): IServerEnvSchema {
-  const name = chalk.underline(pkg.name);
-  const version = chalk.dim(`v${pkg.version}`);
-
-  try {
-    const parsed = serverEnvSchema.parse(env);
-    console.log(chalk.green(`✔ Server environment variables validated for ${name} ${version}`));
-    return parsed;
+    serverEnv = serverEnvSchema.parse(env);
+    logger.info(`Server environment ready for ${name} ${version}`);
   } catch (err) {
-    console.error(chalk.red(`✘ Failed to validate server environment for ${name} ${version}`));
-    console.error(chalk.yellow('Details:'), err);
+    logger.error(`Failed to validate server environment for ${name} ${version}`);
+    logger.error({ err }, 'Details:');
     throw err;
   }
 }
