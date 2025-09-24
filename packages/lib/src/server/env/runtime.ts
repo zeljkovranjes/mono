@@ -36,11 +36,14 @@ function tryToLoadRootEnv(): string | null {
  *
  * Example:
  * ```ts
- * setupServer();               // auto-loads .env from the root and uses process.env
- * setupServer(process.env);    // uses given env object directly
+ * setupServerEnvironment();               // auto-loads .env from the root and uses process.env
+ * setupServerEnvironment(process.env);    // uses given env object directly
+ * setupServerEnvironment(serverEnvSchema.parse({   // manually parse a config.
+ * COOKIE_SECRET: "",
+ *  }))
  * ```
  */
-export function setupServer(env?: Record<string, unknown>) {
+export function setupServerEnvironment(env?: Record<string, unknown>) {
   if (serverEnv) {
     return;
   }
@@ -67,6 +70,45 @@ export function setupServer(env?: Record<string, unknown>) {
 }
 
 /**
+ * Initializes the server environment for this package using a dotenv config result.
+ *
+ * @param dotenvResult The result object from dotenv.config()
+ *
+ * Example:
+ * ```ts
+ * import dotenv from 'dotenv';
+ *
+ * const envResult = dotenv.config({ path: './my-custom.env' });
+ * setupServerEnvironmentFromDotenv(envResult);
+ * ```
+ */
+export function setupServerEnvironmentFromDotenv(dotenvResult: ReturnType<typeof dotenv.config>) {
+  if (serverEnv) {
+    return;
+  }
+
+  const name = chalk.underline(pkg.name);
+  const version = chalk.dim(`v${pkg.version}`);
+
+  logger.info(`Initializing server for ${name} ${version} from dotenv result...`);
+
+  try {
+    // Merge dotenv parsed values with process.env, giving priority to dotenv
+    const mergedEnv = {
+      ...process.env,
+      ...(dotenvResult.parsed || {}),
+    };
+
+    serverEnv = serverEnvSchema.parse(mergedEnv);
+    logger.info(`Server environment ready for ${name} ${version}`);
+  } catch (err) {
+    logger.error(`Failed to validate server environment for ${name} ${version}`);
+    logger.error({ err }, 'Details:');
+    throw err;
+  }
+}
+
+/**
  * Returns the initialized server environment.
  *
  * @internal This function is intended only for internal use within
@@ -76,7 +118,7 @@ export function setupServer(env?: Record<string, unknown>) {
 export function getServerConfig(): IServerEnvSchema {
   if (!serverEnv) {
     throw new Error(
-      'Server environment has not been initialized. Call setupServer() at app startup.',
+      'Server environment has not been initialized. Call setupServerEnvironment() at app startup.',
     );
   }
   return serverEnv;

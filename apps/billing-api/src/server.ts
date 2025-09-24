@@ -1,9 +1,10 @@
-import { setupServer } from '@safeoutput/lib/server/env/runtime';
+import { setupServerEnvironment } from '@safeoutput/lib/server/env/runtime';
+setupServerEnvironment();
+
 import { getLogger } from '@safeoutput/lib/server/logging/index';
 import closeWithGrace from 'close-with-grace';
 import Fastify from 'fastify';
 // initialize the environment for @safeoutput/lib
-setupServer();
 
 const app = Fastify({
   loggerInstance: getLogger(),
