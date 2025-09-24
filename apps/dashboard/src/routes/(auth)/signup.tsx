@@ -21,7 +21,7 @@ import {
 import { Skeleton } from '@safeoutput/ui/components/skeleton';
 import { getPlatformBullet } from '~/utils/display';
 import { RegistrationFlow } from '@ory/client';
-import { getOryFrontend } from '@safeoutput/lib/shared/auth/ory';
+import { getOryFrontend } from '@safeoutput/lib/client/auth/ory';
 import OidcProvider, { useOidc } from '~/components/reusable/oidcProvider';
 import chalk from 'chalk';
 

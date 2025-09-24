@@ -1,7 +1,7 @@
 import { createSignal, For, Show } from 'solid-js';
 import { Button } from '@safeoutput/ui/components/button';
 import type { LoginFlow, RegistrationFlow } from '@ory/client';
-import { getOryFrontend } from '@safeoutput/lib/shared/auth/ory';
+import { getOryFrontend } from '@safeoutput/lib/client/auth/ory';
 import { OryNode, OryErrorResponse, isOryNode } from '@safeoutput/lib/shared/auth/types/ory';
 
 const frontend = getOryFrontend();
