@@ -10,7 +10,9 @@
     "start": "node .output/server.js"
   },
   "dependencies": {
+    "@safeoutput/lib": "workspace:*",
     "chalk": "^5.6.2",
+    "close-with-grace": "^2.3.0",
     "fastify": "^5.6.0",
     "fastify-plugin": "^5.0.1",
     "stripe": "^18.5.0"
