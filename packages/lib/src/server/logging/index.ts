@@ -4,7 +4,7 @@ import { getServerConfig } from '../env/runtime';
 function getLogLevel(): string {
   try {
     return getServerConfig().LOG_LEVEL;
-  } catch (err) {
+  } catch {
     // prevent circular dependency.
     return process.env.LOG_LEVEL || 'trace';
   }
