@@ -1,6 +1,25 @@
 import { IdentityApi, OAuth2Api, PermissionApi, RelationshipApi, Configuration } from '@ory/client';
 import { getServerConfig } from '../../server/env/runtime';
-import { getOryBaseUrl } from '../../shared/auth/helper';
+
+/**
+ * Returns the best ORY base URL depending on runtime (SERVER VARIANT).
+ *
+ * Priority order:
+ *   1. VITE_KRATOS_BROWSER_URL
+ *   2. VITE_KRATOS_PUBLIC_URL
+ *   3. VITE_ORY_SDK_URL
+ *   4. fallback playground URL
+ */
+export function getOryBaseUrl(): string {
+  const config = getServerConfig();
+
+  return (
+    config.VITE_KRATOS_BROWSER_URL ??
+    config.VITE_KRATOS_PUBLIC_URL ??
+    config.VITE_ORY_SDK_URL ??
+    'https://playground.projects.oryapis.com/'
+  );
+}
 
 /**
  * Create an Ory Identity API client for server-side interactions.
