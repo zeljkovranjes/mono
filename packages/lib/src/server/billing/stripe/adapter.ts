@@ -1,6 +1,7 @@
 import Stripe from 'stripe';
 import { CustomerAdapter } from '../model';
 import { getStripe } from './sdk';
+import { createStripeCustomer, getStripeCustomer } from './customer';
 
 /**
  * Stripe implementation of the `CustomerAdapter` interface.
@@ -11,14 +12,12 @@ import { getStripe } from './sdk';
  *
  */
 export const StripeAdapter: CustomerAdapter = {
-  createCustomer: async function <T = Stripe.Customer>(details: {
+  async createCustomer<T = Stripe.Customer>(details: {
     email: string;
     name?: string;
     metadata?: Record<string, string>;
   }): Promise<T> {
-    const stripe = getStripe();
-
-    const created = await stripe.customers.create({
+    const created = await createStripeCustomer({
       email: details.email,
       name: details.name,
       metadata: details.metadata ?? {},
@@ -26,21 +25,14 @@ export const StripeAdapter: CustomerAdapter = {
 
     return created as T;
   },
-  getCustomer: async function <T = Stripe.Customer | Stripe.DeletedCustomer>(
-    id: string,
-  ): Promise<T | null> {
-    const stripe = getStripe();
 
-    try {
-      const res = await stripe.customers.retrieve(id);
-      const payload = (res as any)?.data ?? (res as Stripe.Customer | Stripe.DeletedCustomer);
+  async getCustomer<T = Stripe.Customer>(id: string): Promise<T | null> {
+    const found = await getStripeCustomer(id);
 
-      return payload as T;
-    } catch (err: any) {
-      if (err?.statusCode === 404 || err?.code === 'resource_missing') {
-        return null;
-      }
-      throw err;
+    if (!found) {
+      return null;
     }
+
+    return found as T;
   },
 };
