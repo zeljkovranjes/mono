@@ -1,4 +1,3 @@
-import Stripe from 'stripe';
 import { BillingCustomer, Customer } from '../model';
 import { createStripeCustomer, getStripeCustomer } from './customer';
 
