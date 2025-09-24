@@ -1,5 +1,5 @@
 import type { JSX, ValidComponent } from 'solid-js';
-import { createSignal } from 'solid-js';
+import { createMemo, createSignal, Show } from 'solid-js';
 import { mergeProps, splitProps } from 'solid-js';
 
 import type { PolymorphicProps } from '@kobalte/core';
@@ -68,25 +68,32 @@ const TextFieldInput = <T extends ValidComponent = 'input'>(
     'flex h-10 w-full rounded-sm border border-input bg-gray-50 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[invalid]:border-error-foreground data-[invalid]:text-error-foreground';
 
   /** Padding adjustments depending on icon / toggle */
-  const padLeftForIcon = local.icon && local.iconAlign === 'left' ? 'pl-10' : 'pl-3';
-  // Default right padding (no toggle, no right icon): pr-3
-  // If right icon: add room (pr-10)
-  // If toggle: add room (pr-16)
-  // If both right icon + toggle: even more room (pr-28)
-  const hasRightIcon = !!local.icon && local.iconAlign === 'right';
-  const hasToggle = local.type === 'password';
-  const prClass =
-    hasRightIcon && hasToggle ? 'pr-28' : hasToggle ? 'pr-16' : hasRightIcon ? 'pr-10' : 'pr-3';
+  const padLeftForIcon = createMemo(() =>
+    local.icon && (local.iconAlign ?? 'left') === 'left' ? 'pl-10' : 'pl-3',
+  );
+
+  // Compute padding classes using createMemo for reactivity
+  const padRightClass = createMemo(() => {
+    const hasRightIcon = !!local.icon && (local.iconAlign ?? 'left') === 'right';
+    const hasToggle = local.type === 'password';
+    return hasRightIcon && hasToggle
+      ? 'pr-28'
+      : hasToggle
+        ? 'pr-16'
+        : hasRightIcon
+          ? 'pr-10'
+          : 'pr-3';
+  });
 
   /** Renders the icon appropriately positioned */
-  const IconNode = () =>
-    local.icon ? (
+  const IconNode = () => (
+    <Show when={local.icon}>
       <div
         class={cn(
           'pointer-events-none absolute inset-y-0 my-auto flex h-5 w-5 items-center justify-center text-muted-foreground',
-          local.iconAlign === 'left'
+          (local.iconAlign ?? 'left') === 'left'
             ? 'left-3'
-            : hasToggle
+            : local.type === 'password'
               ? // If there is also a password toggle, shift icon left a bit to make space for the toggle button
                 'right-14'
               : 'right-3',
@@ -95,55 +102,74 @@ const TextFieldInput = <T extends ValidComponent = 'input'>(
       >
         {local.icon}
       </div>
-    ) : null;
+    </Show>
+  );
 
-  // PASSWORD INPUT WITH TOGGLE (supports optional icon)
-  if (local.type === 'password') {
-    const [shown, setShown] = createSignal(false);
-
-    return (
-      <div class="relative">
-        <TextFieldPrimitive.Input
-          type={shown() ? 'text' : 'password'}
-          class={cn(baseInput, padLeftForIcon, prClass, local.class)}
-          {...(others as any)}
+  // Use Show component instead of early returns for reactivity
+  return (
+    <>
+      <Show when={local.type === 'password'}>
+        <PasswordInput
+          local={local}
+          others={others}
+          baseInput={baseInput}
+          padLeftForIcon={padLeftForIcon()}
+          padRightClass={padRightClass()}
+          IconNode={IconNode}
         />
-        {IconNode()}
-        <button
-          type="button"
-          class="absolute inset-y-0 right-2 my-auto h-7 rounded-sm px-2 text-xs font-medium underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-          aria-pressed={shown()}
-          aria-label={shown() ? 'Hide password' : 'Show password'}
-          onClick={() => setShown((v) => !v)}
-        >
-          {shown() ? 'Hide' : 'Show'}
-        </button>
-      </div>
-    );
-  }
+      </Show>
 
-  // NON-PASSWORD INPUT
-  if (local.icon) {
-    // Wrap to position the icon inside the input
-    return (
-      <div class="relative">
+      <Show when={local.type !== 'password' && local.icon}>
+        <div class="relative">
+          <TextFieldPrimitive.Input
+            type={local.type}
+            class={cn(baseInput, padLeftForIcon(), padRightClass(), local.class)}
+            {...(others as TextFieldPrimitive.TextFieldInputProps)}
+          />
+          <IconNode />
+        </div>
+      </Show>
+
+      <Show when={local.type !== 'password' && !local.icon}>
         <TextFieldPrimitive.Input
           type={local.type}
-          class={cn(baseInput, padLeftForIcon, prClass, local.class)}
-          {...(others as any)}
+          class={cn(baseInput, 'px-3', local.class)}
+          {...(others as TextFieldPrimitive.TextFieldInputProps)}
         />
-        {IconNode()}
-      </div>
-    );
-  }
+      </Show>
+    </>
+  );
+};
 
-  // Plain input (no icon, no toggle)
+// Separate password input component to handle the toggle logic
+const PasswordInput = (props: {
+  local: { type?: string; class?: string; icon?: JSX.Element; iconAlign?: 'left' | 'right' };
+  others: Record<string, unknown>;
+  baseInput: string;
+  padLeftForIcon: string;
+  padRightClass: string;
+  IconNode: () => JSX.Element;
+}) => {
+  const [shown, setShown] = createSignal(false);
+
   return (
-    <TextFieldPrimitive.Input
-      type={local.type}
-      class={cn(baseInput, 'px-3', local.class)}
-      {...(others as any)}
-    />
+    <div class="relative">
+      <TextFieldPrimitive.Input
+        type={shown() ? 'text' : 'password'}
+        class={cn(props.baseInput, props.padLeftForIcon, props.padRightClass, props.local.class)}
+        {...(props.others as TextFieldPrimitive.TextFieldInputProps)}
+      />
+      <props.IconNode />
+      <button
+        type="button"
+        class="absolute inset-y-0 right-2 my-auto h-7 rounded-sm px-2 text-xs font-medium underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        aria-pressed={shown()}
+        aria-label={shown() ? 'Hide password' : 'Show password'}
+        onClick={() => setShown((v) => !v)}
+      >
+        {shown() ? 'Hide' : 'Show'}
+      </button>
+    </div>
   );
 };
 

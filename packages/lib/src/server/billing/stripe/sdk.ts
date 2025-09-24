@@ -2,7 +2,7 @@ import Stripe from 'stripe';
 import { getServerConfig } from '../../env/runtime';
 
 let stripe: Stripe | null = null;
-let version: Stripe.LatestApiVersion = '2025-08-27.basil';
+const version: Stripe.LatestApiVersion = '2025-08-27.basil';
 
 /**
  * Initializes and returns a new Stripe instance using the server's secret key.

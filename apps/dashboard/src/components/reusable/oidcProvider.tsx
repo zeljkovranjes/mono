@@ -2,6 +2,7 @@ import { createSignal, For, Show } from 'solid-js';
 import { Button } from '@safeoutput/ui/components/button';
 import type { LoginFlow, RegistrationFlow } from '@ory/client';
 import { getOryFrontend } from '@safeoutput/lib/shared/auth/ory';
+import { OryNode, OryErrorResponse, isOryNode } from '@safeoutput/lib/shared/auth/types/ory';
 
 const frontend = getOryFrontend();
 
@@ -11,17 +12,20 @@ export function useOidc(
   flowType: 'login' | 'registration' = 'login',
 ) {
   const [isOidcLoading, setIsOidcLoading] = createSignal(false);
-  const [oidcProviders, setOidcProviders] = createSignal<any[]>([]);
+  const [oidcProviders, setOidcProviders] = createSignal<OryNode[]>([]);
 
   const extractProviders = () => {
     const currentFlow = flow();
     if (currentFlow?.ui?.nodes) {
-      const nodes = currentFlow.ui.nodes.filter((n) => n.group === 'oidc');
+      const nodes = currentFlow.ui.nodes
+        .filter((n) => n.group === 'oidc')
+        .filter(isOryNode) as unknown as OryNode[];
+
       setOidcProviders(nodes);
     }
   };
 
-  const handleOidcLogin = async (providerNode: any) => {
+  const handleOidcLogin = async (providerNode: OryNode) => {
     const currentFlow = flow();
     const csrfToken = getCsrfToken();
     if (!currentFlow || !csrfToken) return;
@@ -29,7 +33,6 @@ export function useOidc(
     try {
       setIsOidcLoading(true);
 
-      // Choose the correct API call based on flow type
       if (flowType === 'login') {
         await frontend.updateLoginFlow({
           flow: currentFlow.id,
@@ -49,12 +52,12 @@ export function useOidc(
           },
         });
       }
-    } catch (err: any) {
-      // Check if the error is the expected 422 redirect instruction from Ory.
-      if (err.response?.status === 422 && err.response?.data?.redirect_browser_to) {
-        // This is the successful path for OIDC. Perform the redirect.
-        window.location.href = err.response.data.redirect_browser_to;
-        return; // Stop execution to prevent hitting the finally block too early
+    } catch (err: unknown) {
+      const oryError = err as OryErrorResponse;
+
+      if (oryError.response?.status === 422 && oryError.response?.data?.redirect_browser_to) {
+        window.location.href = oryError.response.data.redirect_browser_to;
+        return;
       }
 
       // If it's any other type of error, treat it as a failure.
@@ -72,9 +75,9 @@ interface OidcProviderProps {
   flow: () => LoginFlow | RegistrationFlow | null;
   getCsrfToken: () => string;
   flowType?: 'login' | 'registration';
-  oidcProviders: () => any[];
+  oidcProviders: () => OryNode[];
   isOidcLoading: () => boolean;
-  handleOidcLogin: (providerNode: any) => Promise<void>;
+  handleOidcLogin: (providerNode: OryNode) => Promise<void>;
 }
 
 const getProviderIcon = (provider: string) => {

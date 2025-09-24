@@ -1,6 +1,6 @@
 import type { JSX } from 'solid-js';
 import type { ValidComponent } from 'solid-js';
-import { splitProps } from 'solid-js';
+import { splitProps, createMemo } from 'solid-js';
 
 import type { PolymorphicProps } from '@kobalte/core/polymorphic';
 import * as SeparatorPrimitive from '@kobalte/core/separator';
@@ -40,32 +40,31 @@ type LabeledSeparatorProps = {
 };
 
 export const LabeledSeparator = (props: LabeledSeparatorProps) => {
-  const orientation = props.orientation ?? 'horizontal';
-  const isVertical = orientation === 'vertical';
-
-  const gap = props.gapClass ?? (isVertical ? 'my-3' : 'mx-3');
+  const orientation = createMemo(() => props.orientation ?? 'horizontal');
+  const isVertical = createMemo(() => orientation() === 'vertical');
+  const gap = createMemo(() => props.gapClass ?? (isVertical() ? 'my-3' : 'mx-3'));
 
   return (
     <div
       class={cn(
         'flex items-center',
-        isVertical ? 'flex-col' : 'flex-row',
-        props.inset && !isVertical && 'pl-3',
+        isVertical() ? 'flex-col' : 'flex-row',
+        props.inset && !isVertical() && 'pl-3',
         props.class,
       )}
       role="group"
     >
       <SeparatorPrimitive.Root
         aria-hidden="true"
-        orientation={orientation}
+        orientation={orientation()}
         class={cn(
           'bg-border shrink-0',
-          isVertical ? 'w-px flex-1' : 'h-px flex-1',
+          isVertical() ? 'w-px flex-1' : 'h-px flex-1',
           props.lineClass,
         )}
       />
 
-      <span class={cn(gap, 'relative inline-flex')}>
+      <span class={cn(gap(), 'relative inline-flex')}>
         <span
           class={cn(
             'px-2 text-sm text-muted-foreground',
@@ -80,10 +79,10 @@ export const LabeledSeparator = (props: LabeledSeparatorProps) => {
 
       <SeparatorPrimitive.Root
         aria-hidden="true"
-        orientation={orientation}
+        orientation={orientation()}
         class={cn(
           'bg-border shrink-0',
-          isVertical ? 'w-px flex-1' : 'h-px flex-1',
+          isVertical() ? 'w-px flex-1' : 'h-px flex-1',
           props.lineClass,
         )}
       />
