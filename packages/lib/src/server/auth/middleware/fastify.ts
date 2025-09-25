@@ -155,13 +155,12 @@ export function requirePermissionMiddleware(
  * - If `expectedSecret` is provided → use that.
  * - Otherwise → fallback to config.API_SECRET_KEY.
  *
- * Client must send the secret in `x-secret-key` header.
  */
 export function requireSecretMiddleware(expectedSecret?: string) {
   const secretToCheck = expectedSecret ?? getServerConfig().API_SECRET_KEY;
 
   return async function (req: FastifyRequest, reply: FastifyReply) {
-    const authHeader = req.headers['Authorization'];
+    const authHeader = req.headers['authorization'];
 
     if (typeof authHeader !== 'string' || !authHeader.startsWith('Bearer ')) {
       return reply.status(401).send({
@@ -174,8 +173,8 @@ export function requireSecretMiddleware(expectedSecret?: string) {
 
     if (provided !== secretToCheck) {
       return reply.status(403).send({
-        error: 'Forbidden',
-        message: 'Invalid secret key',
+        error: 'Unauthorized',
+        message: 'Missing or malformed Authorization header',
       });
     }
   };
