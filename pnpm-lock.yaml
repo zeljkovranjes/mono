@@ -256,12 +256,18 @@ importers:
       '@types/node':
         specifier: ^22.15.3
         version: 22.15.3
+      '@types/pg':
+        specifier: ^8.15.5
+        version: 8.15.5
       eslint:
         specifier: ^9.34.0
         version: 9.34.0(jiti@2.5.1)
       kysely-codegen:
         specifier: ^0.19.0
         version: 0.19.0(kysely@0.28.7)(pg@8.16.3)(typescript@5.9.2)
+      kysely-ctl:
+        specifier: ^0.19.0
+        version: 0.19.0(kysely@0.28.7)(magicast@0.3.5)(typescript@5.9.2)
       typescript:
         specifier: 5.9.2
         version: 5.9.2
@@ -1365,6 +1371,9 @@ packages:
 
   '@types/node@24.5.2':
     resolution: {integrity: sha512-FYxk1I7wPv3K2XBaoyH2cTnocQEu8AOZ60hPbsyukMPLv5/5qr7V1i8PLHdl6Zf87I+xZXFvPCXYjiTFq+YSDQ==}
+
+  '@types/pg@8.15.5':
+    resolution: {integrity: sha512-LF7lF6zWEKxuT3/OR8wAZGzkg4ENGXFNyiV/JeOt9z5B+0ZVwbql9McqX5c/WStFq1GaGso7H1AzP/qSzmlCKQ==}
 
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
@@ -2892,6 +2901,23 @@ packages:
       tedious:
         optional: true
 
+  kysely-ctl@0.19.0:
+    resolution: {integrity: sha512-89hzOd1cy/H063jB2E9wYHq+uKYpaHv6Mb5RiNFpRZL6BYCah9ncsdl3x5b52eirxry4UyWSmGNN3sFv+gK+ig==}
+    engines: {node: '>=20'}
+    hasBin: true
+    peerDependencies:
+      kysely: '>=0.18.1 <0.29.0'
+      kysely-neon: ^2
+      kysely-postgres-js: ^2 || ^3
+      kysely-prisma-postgres: ^0.1
+    peerDependenciesMeta:
+      kysely-neon:
+        optional: true
+      kysely-postgres-js:
+        optional: true
+      kysely-prisma-postgres:
+        optional: true
+
   kysely@0.28.7:
     resolution: {integrity: sha512-u/cAuTL4DRIiO2/g4vNGRgklEKNIj5Q3CG7RoUB5DV5SfEC2hMvPxKi0GWPmnzwL2ryIeud2VTcEEmqzTzEPNw==}
     engines: {node: '>=20.0.0'}
@@ -3922,6 +3948,16 @@ packages:
     engines: {node: '>=18.12'}
     peerDependencies:
       typescript: '>=4.8.4'
+
+  tsconfck@3.1.6:
+    resolution: {integrity: sha512-ks6Vjr/jEw0P1gmOVwutM3B7fWxoWBL2KRDb1JfqGVawBmO5UsvmWOQFGHBPl5yxYz4eERr19E6L7NMv+Fej4w==}
+    engines: {node: ^18 || >=20}
+    hasBin: true
+    peerDependencies:
+      typescript: ^5.0.0
+    peerDependenciesMeta:
+      typescript:
+        optional: true
 
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
@@ -5397,6 +5433,12 @@ snapshots:
   '@types/node@24.5.2':
     dependencies:
       undici-types: 7.12.0
+
+  '@types/pg@8.15.5':
+    dependencies:
+      '@types/node': 24.5.2
+      pg-protocol: 1.10.3
+      pg-types: 2.2.0
 
   '@types/resolve@1.20.2': {}
 
@@ -7240,6 +7282,24 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
+  kysely-ctl@0.19.0(kysely@0.28.7)(magicast@0.3.5)(typescript@5.9.2):
+    dependencies:
+      c12: 3.3.0(magicast@0.3.5)
+      citty: 0.1.6
+      confbox: 0.2.2
+      consola: 3.4.2
+      jiti: 2.5.1
+      kysely: 0.28.7
+      nypm: 0.6.2
+      ofetch: 1.4.1
+      pathe: 2.0.3
+      pkg-types: 2.3.0
+      std-env: 3.9.0
+      tsconfck: 3.1.6(typescript@5.9.2)
+    transitivePeerDependencies:
+      - magicast
+      - typescript
+
   kysely@0.28.7: {}
 
   lazystream@1.0.1:
@@ -8382,6 +8442,10 @@ snapshots:
 
   ts-api-utils@2.1.0(typescript@5.9.2):
     dependencies:
+      typescript: 5.9.2
+
+  tsconfck@3.1.6(typescript@5.9.2):
+    optionalDependencies:
       typescript: 5.9.2
 
   tslib@2.8.1: {}
