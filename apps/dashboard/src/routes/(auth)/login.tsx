@@ -92,7 +92,6 @@ export default function Login() {
   );
 
   const initialize = async () => {
-    console.log('→ Initializing Loginflow session...');
     try {
       setIsInitializing(true);
       setError(null);
@@ -103,7 +102,6 @@ export default function Login() {
       if (flowId) {
         try {
           flow = await getExistingLoginFlow(flowId);
-          console.log(`✔ Reused Loginflow session with flow id: ${flowId}`);
         } catch (err: any) {
           const status = err.response?.status;
           if (status === 404 || status === 403 || status === 410) {
@@ -114,13 +112,11 @@ export default function Login() {
         }
       } else {
         flow = await createNewLoginFlow();
-        console.log(`✔ Initialized Loginflow generated session with flow id: ${flow.id}`);
       }
 
       setLoginFlow(flow);
       extractProviders();
     } catch (err: any) {
-      console.error(`✘ Failed to initialize Loginflow session`, err);
       setError('Failed to initialize login. Please refresh the page.');
     } finally {
       setIsInitializing(false);

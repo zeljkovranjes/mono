@@ -117,7 +117,6 @@ export default function SignUp() {
   );
 
   const initialize = async () => {
-    console.log('→ Initializing Registration flow session...');
     try {
       setIsInitializing(true);
       setError(null);
@@ -128,7 +127,6 @@ export default function SignUp() {
       if (flowId) {
         try {
           flow = await getExistingRegistrationFlow(flowId);
-          console.log(`✔ Reused Registration flow session with flow id: ${flowId}`);
         } catch (err: any) {
           const status = err.response?.status;
           if (status === 404 || status === 403 || status === 410) {
@@ -139,7 +137,6 @@ export default function SignUp() {
         }
       } else {
         flow = await createNewRegistrationFlow();
-        console.log(`✔ Initialized Registration flow generated session with flow id: ${flow.id}`);
       }
 
       setRegistrationFlow(flow);
