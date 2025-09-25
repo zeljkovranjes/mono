@@ -6,7 +6,7 @@
       "dependsOn": ["lint", "format", "^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": ["dist/**", ".output/**", "!.output/cache/**"],
-      "env": ["VITE_*"]
+      "env": ["VITE_*", "LOG_LEVEL"]
     },
     "lint": {
       "dependsOn": ["^lint"]
