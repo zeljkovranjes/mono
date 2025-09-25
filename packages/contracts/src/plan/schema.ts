@@ -7,6 +7,7 @@ export const PlanSchema = z.object({
   stripe_price_id: z.string().max(255),
   stripe_product_id: z.string().max(255),
   price_per_month: z.number().nonnegative(),
+  metadata: z.record(z.string(), z.unknown()).default({}),
   created_at: z.iso.datetime(),
   updated_at: z.iso.datetime(),
 });
@@ -17,6 +18,7 @@ export const CreatePlanSchema = z.object({
   stripe_price_id: z.string().max(255),
   stripe_product_id: z.string().max(255),
   price_per_month: z.number().nonnegative(),
+  metadata: z.record(z.string(), z.unknown()).optional().default({}),
 });
 
 export const UpdatePlanSchema = CreatePlanSchema.partial();
