@@ -1,9 +1,12 @@
-import { setupServerEnvironment } from '@safeoutput/lib/server/env/runtime';
-setupServerEnvironment();
-
 import { getLogger } from '@safeoutput/lib/server/logging/index';
 import closeWithGrace from 'close-with-grace';
 import Fastify from 'fastify';
+
+import { setupServerEnvironment } from '@safeoutput/lib/server/env/runtime';
+import serviceApp from './app';
+
+setupServerEnvironment();
+
 // initialize the environment for @safeoutput/lib
 
 const app = Fastify({
@@ -17,6 +20,7 @@ const app = Fastify({
 });
 
 async function init() {
+  app.register(serviceApp);
   closeWithGrace({ delay: 500 }, async ({ err }) => {
     if (err != null) {
       app.log.error(err);
