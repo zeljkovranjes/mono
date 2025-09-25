@@ -1,15 +1,11 @@
-import {
-  DummyDriver,
-  PostgresAdapter,
-  PostgresDialect,
-  PostgresIntrospector,
-  PostgresQueryCompiler,
-} from 'kysely';
 import { defineConfig } from 'kysely-ctl';
-import { postgresDialect } from '../src/server/db/pg';
+import { getPostgresDialect } from '../src/server/db/pg';
+import { setupServerEnvironment } from '../src/server/env/runtime';
+
+setupServerEnvironment();
 
 export default defineConfig({
-  dialect: postgresDialect,
+  dialect: getPostgresDialect(true),
   //   migrations: {
   //     migrationFolder: "migrations",
   //   },
