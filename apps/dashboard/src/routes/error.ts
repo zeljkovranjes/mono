@@ -1,4 +1,4 @@
-import { getOryFrontend } from '@safeoutput/lib/shared/auth/ory';
+import { getOryFrontend } from '@safeoutput/lib/server/auth/ory';
 import type { APIEvent } from '@solidjs/start/server';
 import { isAxiosError } from 'axios';
 
