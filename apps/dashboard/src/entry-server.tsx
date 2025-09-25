@@ -1,7 +1,7 @@
 // @refresh reload
+import { createHandler, StartServer } from '@solidjs/start/server';
 import { setupServerEnvironment } from '@safeoutput/lib/server/env/runtime';
 setupServerEnvironment(process.env);
-import { createHandler, StartServer } from '@solidjs/start/server';
 
 export default createHandler(() => (
   <StartServer

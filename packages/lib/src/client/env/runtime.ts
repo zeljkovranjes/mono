@@ -1,20 +1,16 @@
 import { clientEnvSchema, type IClientEnvSchema } from './schema';
-import pkg from '../../../package.json';
-import chalk from 'chalk';
 
 let clientEnv: IClientEnvSchema | null = null;
 
 /**
  * Initializes the client environment for this package.
  *
- * @param cfg The validated client environment, typically created by parsing
+ * @param env The validated client environment, typically created by parsing
  *            `import.meta.env` with `clientEnvSchema.parse(import.meta.env)`.
  *
  * Example:
  * ```ts
- * setupClientEnvironment({
- *   client: clientEnvSchema.parse(import.meta.env),
- * });
+ * setupClientEnvironment(import.meta.env);
  * ```
  */
 export function setupClientEnvironment(env: Record<string, unknown>) {
@@ -22,12 +18,9 @@ export function setupClientEnvironment(env: Record<string, unknown>) {
     return;
   }
 
-  const name = chalk.underline(pkg.name);
-  const version = chalk.dim(`v${pkg.version}`);
-
-  console.log(chalk.gray(`→ Initializing client for ${name} ${version}...`));
+  console.log('→ Initializing client environment...');
   clientEnv = parse(env);
-  console.log(chalk.green(`✔ Client environment ready for ${name} ${version}`));
+  console.log('✔ Client environment ready');
 }
 
 /**
@@ -36,24 +29,15 @@ export function setupClientEnvironment(env: Record<string, unknown>) {
  * @param env The environment source (e.g., import.meta.env).
  * @returns The validated client environment schema.
  * @throws Error if validation fails.
- *
- * Example:
- * ```ts
- * const cfg = clientEnvSchema(process.env);
- * setupServer(cfg);
- * ```
  */
 function parse(env: Record<string, unknown>): IClientEnvSchema {
-  const name = chalk.underline(pkg.name);
-  const version = chalk.dim(`v${pkg.version}`);
-
   try {
     const parsed = clientEnvSchema.parse(env);
-    console.log(chalk.green(`✔ Client environment variables validated for ${name} ${version}`));
+    console.log('✔ Client environment variables validated');
     return parsed;
   } catch (err) {
-    console.error(chalk.red(`✘ Failed to validate client environment for ${name} ${version}`));
-    console.error(chalk.yellow('Details:'), err);
+    console.error('✘ Failed to validate client environment');
+    console.error('Details:', err);
     throw err;
   }
 }
@@ -68,7 +52,7 @@ function parse(env: Record<string, unknown>): IClientEnvSchema {
 export function getClientConfig(): IClientEnvSchema {
   if (!clientEnv) {
     throw new Error(
-      'Client environment has not been initialized. Call setupClient() at app startup.',
+      'Client environment has not been initialized. Call setupClientEnvironment() at app startup.',
     );
   }
   return clientEnv;

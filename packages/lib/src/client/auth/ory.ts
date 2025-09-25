@@ -12,7 +12,6 @@ import { getClientConfig } from '../env/runtime';
  */
 export function getOryBaseUrl(): string {
   const config = getClientConfig();
-
   return (
     config.VITE_KRATOS_BROWSER_URL ??
     config.VITE_KRATOS_PUBLIC_URL ??

@@ -23,7 +23,6 @@ import { getPlatformBullet } from '~/utils/display';
 import { RegistrationFlow } from '@ory/client';
 import { getOryFrontend } from '@safeoutput/lib/client/auth/ory';
 import OidcProvider, { useOidc } from '~/components/reusable/oidcProvider';
-import chalk from 'chalk';
 
 let frontend = getOryFrontend();
 
@@ -68,14 +67,12 @@ export default function SignUp() {
     const errorMessage = flow.ui.messages.find((msg) => msg.type === 'error');
     if (errorMessage) return errorMessage.text;
 
-    // Check for field-level errors and make them more user-friendly
     const nodes = flow.ui.nodes || [];
     for (const node of nodes) {
       if (node.messages && node.messages.length > 0) {
         const fieldError = node.messages.find((msg) => msg.type === 'error');
         if (fieldError) {
           const fieldName = (node.attributes as any)?.name;
-          // Make error messages more user-friendly
           if (fieldName === 'traits.email') {
             return `Email: ${fieldError.text}`;
           } else if (fieldName === 'password') {
@@ -95,13 +92,9 @@ export default function SignUp() {
     // @ts-ignore
     const field = registrationFlow()?.ui?.nodes.find((n) => n.attributes?.name === name);
     const msg = field?.messages?.find((m) => m.type === 'error');
-
     if (!msg) return null;
 
-    // Make error messages more user-friendly
     const errorText = msg.text;
-
-    // Common validation error improvements
     if (errorText.includes('required')) {
       return 'This field is required';
     }
@@ -114,7 +107,6 @@ export default function SignUp() {
     if (errorText.includes('expected object, but got string')) {
       return 'Please enter your full name';
     }
-
     return errorText;
   };
 
@@ -125,7 +117,7 @@ export default function SignUp() {
   );
 
   const initialize = async () => {
-    console.log(chalk.gray(`→ Initializing Registration flow session...`));
+    console.log('→ Initializing Registration flow session...');
     try {
       setIsInitializing(true);
       setError(null);
@@ -136,11 +128,7 @@ export default function SignUp() {
       if (flowId) {
         try {
           flow = await getExistingRegistrationFlow(flowId);
-          console.log(
-            chalk.green(
-              `✔ Reused Registration flow session with flow id: ${chalk.underline(flowId)}`,
-            ),
-          );
+          console.log(`✔ Reused Registration flow session with flow id: ${flowId}`);
         } catch (err: any) {
           const status = err.response?.status;
           if (status === 404 || status === 403 || status === 410) {
@@ -151,19 +139,13 @@ export default function SignUp() {
         }
       } else {
         flow = await createNewRegistrationFlow();
-        console.log(
-          chalk.green(
-            `✔ Initialized Registration flow generated session with flow id: ${chalk.underline(flow.id)}`,
-          ),
-        );
+        console.log(`✔ Initialized Registration flow generated session with flow id: ${flow.id}`);
       }
 
       setRegistrationFlow(flow);
       extractProviders();
     } catch (err: any) {
-      console.error(
-        chalk.red(`✘ Failed to initialize Registration flow session with flow id: {${err}}`),
-      );
+      console.error('✘ Failed to initialize Registration flow session', err);
       setError('Failed to initialize registration. Please refresh the page.');
     } finally {
       setIsInitializing(false);
@@ -217,7 +199,6 @@ export default function SignUp() {
         if (errorMsg) {
           setError(errorMsg);
         } else {
-          // Fallback with more specific error based on likely causes
           setError(
             'Please check your information and try again. Make sure your email is valid and your password meets the requirements.',
           );
@@ -252,7 +233,6 @@ export default function SignUp() {
         <div class="flex flex-col gap-3">
           <Skeleton height={40} width={336} radius={6} />
         </div>
-
         <div class="flex items-center gap-2">
           <div class="flex-1">
             <Skeleton height={1} width={150} radius={0} />

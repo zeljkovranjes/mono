@@ -1,6 +1,4 @@
 import { serverEnvSchema, type IServerEnvSchema } from './schema';
-import pkg from '../../../package.json';
-import chalk from 'chalk';
 import { findUpSync } from 'find-up';
 import dotenv from 'dotenv';
 import { getLogger } from '../logging';
@@ -33,25 +31,13 @@ function tryToLoadRootEnv(): string | null {
  * (via {@link tryToLoadRootEnv}) and then fall back to `process.env`.
  *
  * @param env The environment source (defaults to `process.env` if omitted).
- *
- * Example:
- * ```ts
- * setupServerEnvironment();               // auto-loads .env from the root and uses process.env
- * setupServerEnvironment(process.env);    // uses given env object directly
- * setupServerEnvironment(serverEnvSchema.parse({   // manually parse a config.
- * COOKIE_SECRET: "",
- *  }))
- * ```
  */
 export function setupServerEnvironment(env?: Record<string, unknown>) {
   if (serverEnv) {
     return;
   }
 
-  const name = chalk.underline(pkg.name);
-  const version = chalk.dim(`v${pkg.version}`);
-
-  logger.info(`Initializing server for ${name} ${version}...`);
+  logger.info(`Initializing server environment...`);
 
   try {
     if (!env) {
@@ -61,9 +47,9 @@ export function setupServerEnvironment(env?: Record<string, unknown>) {
     }
 
     serverEnv = serverEnvSchema.parse(env);
-    logger.info(`Server environment ready for ${name} ${version}`);
+    logger.info(`✔ Server environment ready`);
   } catch (err) {
-    logger.error(`Failed to validate server environment for ${name} ${version}`);
+    logger.error(`✘ Failed to validate server environment`);
     logger.error({ err }, 'Details:');
     throw err;
   }
@@ -73,24 +59,13 @@ export function setupServerEnvironment(env?: Record<string, unknown>) {
  * Initializes the server environment for this package using a dotenv config result.
  *
  * @param dotenvResult The result object from dotenv.config()
- *
- * Example:
- * ```ts
- * import dotenv from 'dotenv';
- *
- * const envResult = dotenv.config({ path: './my-custom.env' });
- * setupServerEnvironmentFromDotenv(envResult);
- * ```
  */
 export function setupServerEnvironmentFromDotenv(dotenvResult: ReturnType<typeof dotenv.config>) {
   if (serverEnv) {
     return;
   }
 
-  const name = chalk.underline(pkg.name);
-  const version = chalk.dim(`v${pkg.version}`);
-
-  logger.info(`Initializing server for ${name} ${version} from dotenv result...`);
+  logger.info(`Initializing server environment from dotenv result...`);
 
   try {
     // Merge dotenv parsed values with process.env, giving priority to dotenv
@@ -100,9 +75,9 @@ export function setupServerEnvironmentFromDotenv(dotenvResult: ReturnType<typeof
     };
 
     serverEnv = serverEnvSchema.parse(mergedEnv);
-    logger.info(`Server environment ready for ${name} ${version}`);
+    logger.info(`✔ Server environment ready`);
   } catch (err) {
-    logger.error(`Failed to validate server environment for ${name} ${version}`);
+    logger.error(`✘ Failed to validate server environment`);
     logger.error({ err }, 'Details:');
     throw err;
   }

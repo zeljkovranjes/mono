@@ -23,7 +23,6 @@ import { getPlatformBullet } from '~/utils/display';
 import { LoginFlow } from '@ory/client';
 import { getOryFrontend } from '@safeoutput/lib/client/auth/ory';
 import OidcProvider, { useOidc } from '~/components/reusable/oidcProvider';
-import chalk from 'chalk';
 
 let frontend = getOryFrontend();
 
@@ -67,14 +66,12 @@ export default function Login() {
     const errorMessage = flow.ui.messages.find((msg) => msg.type === 'error');
     if (errorMessage) return errorMessage.text;
 
-    // Check for field-level errors and make them more user-friendly
     const nodes = flow.ui.nodes || [];
     for (const node of nodes) {
       if (node.messages && node.messages.length > 0) {
         const fieldError = node.messages.find((msg) => msg.type === 'error');
         if (fieldError) {
           const fieldName = (node.attributes as any)?.name;
-          // Make error messages more user-friendly
           if (fieldName === 'identifier') {
             return `Email: ${fieldError.text}`;
           } else if (fieldName === 'password') {
@@ -95,7 +92,7 @@ export default function Login() {
   );
 
   const initialize = async () => {
-    console.log(chalk.gray(`→ Initializing Loginflow session...`));
+    console.log('→ Initializing Loginflow session...');
     try {
       setIsInitializing(true);
       setError(null);
@@ -106,9 +103,7 @@ export default function Login() {
       if (flowId) {
         try {
           flow = await getExistingLoginFlow(flowId);
-          console.log(
-            chalk.green(`✔ Reused Loginflow session with flow id: ${chalk.underline(flowId)}`),
-          );
+          console.log(`✔ Reused Loginflow session with flow id: ${flowId}`);
         } catch (err: any) {
           const status = err.response?.status;
           if (status === 404 || status === 403 || status === 410) {
@@ -119,17 +114,13 @@ export default function Login() {
         }
       } else {
         flow = await createNewLoginFlow();
-        console.log(
-          chalk.green(
-            `✔ Initialized Loginflow generated session with flow id: ${chalk.underline(flow.id)}`,
-          ),
-        );
+        console.log(`✔ Initialized Loginflow generated session with flow id: ${flow.id}`);
       }
 
       setLoginFlow(flow);
       extractProviders();
     } catch (err: any) {
-      console.error(chalk.red(`✘ Failed to initialize Loginflow session with flow id: {${err}}`));
+      console.error(`✘ Failed to initialize Loginflow session`, err);
       setError('Failed to initialize login. Please refresh the page.');
     } finally {
       setIsInitializing(false);
@@ -140,13 +131,9 @@ export default function Login() {
     // @ts-ignore
     const field = loginFlow()?.ui?.nodes.find((n) => n.attributes?.name === name);
     const msg = field?.messages?.find((m) => m.type === 'error');
-
     if (!msg) return null;
 
-    // Make error messages more user-friendly
     const errorText = msg.text;
-
-    // Common validation error improvements
     if (errorText.includes('required')) {
       return 'This field is required';
     }
@@ -159,7 +146,6 @@ export default function Login() {
     if (errorText.includes('password') && errorText.includes('incorrect')) {
       return 'Incorrect password';
     }
-
     return errorText;
   };
 
@@ -205,7 +191,6 @@ export default function Login() {
         if (errorMsg) {
           setError(errorMsg);
         } else {
-          // Fallback with more specific error based on likely causes
           setError('Invalid email or password. Please check your credentials and try again.');
         }
       } else if (err.response?.status === 422) {
@@ -238,7 +223,6 @@ export default function Login() {
         <div class="flex flex-col gap-3">
           <Skeleton height={40} width={336} radius={6} />
         </div>
-
         <div class="flex items-center gap-2">
           <div class="flex-1">
             <Skeleton height={1} width={150} radius={0} />
