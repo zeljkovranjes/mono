@@ -1,10 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { maybeInitiate2FA } from '../../../shared/auth/helper';
 import { getServerConfig } from '../../env/runtime';
 import { getOryBaseUrl, getOryFrontend, getOryPermissions } from '../ory';
 import { FastifyRequest, FastifyReply } from 'fastify';
 
-let frontend = getOryFrontend();
-let permissions = getOryPermissions();
+const frontend = getOryFrontend();
+const permissions = getOryPermissions();
 
 /**
  * Middleware that prevents users with no valid from accessing
@@ -19,7 +21,7 @@ export async function requireAuthMiddleware(req: FastifyRequest, reply: FastifyR
   try {
     const { data: session } = await frontend.toSession({ cookie: cookieHeader });
     (req as any).session = session;
-  } catch (err: any) {
+  } catch {
     reply.redirect(`${getOryBaseUrl()}/self-service/login/browser`, 302);
   }
 }
