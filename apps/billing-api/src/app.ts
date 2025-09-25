@@ -12,8 +12,6 @@ export const options = {
   },
 };
 
-export default async function serviceApp(fastify: FastifyInstance, opts: FastifyPluginOptions) {}
-/*
 // Helper function to safely load directories
 async function safeAutoload(
   fastify: FastifyInstance,
@@ -104,4 +102,3 @@ export default async function serviceApp(fastify: FastifyInstance, opts: Fastify
     return { message: 'Not Found' };
   });
 }
-*/
