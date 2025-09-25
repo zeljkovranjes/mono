@@ -1,3 +1,30 @@
+/**
+ * Registers the `/billing/webhook` route for the billing service.
+ *
+ * This endpoint receives and verifies Stripe webhook events. .
+ *
+ * Security:
+ *  - Requires a valid secret via {@link requireSecretMiddleware}.
+ *  - Requires a valid `Stripe-Signature` header from Stripe.
+ *
+ * Handled event types include (non-exhaustive):
+ *  - `checkout.session.completed`
+ *  - `customer.subscription.updated`
+ *  - `customer.subscription.deleted`
+ *  - `charge.refunded`
+ *  - `product.*` (created, updated, deleted)
+ *  - `price.*` (created, updated)
+ *
+ * @route POST /billing/webhook
+ * @security StripeSignature
+ * @returns 200 - Acknowledges receipt of the event
+ *
+ * Example response:
+ * ```
+ * HTTP/1.1 200 OK
+ * ```
+ */
+
 import { requireSecretMiddleware } from '@safeoutput/lib/server/auth/middleware/fastify';
 import { getStripe } from '@safeoutput/lib/server/billing/stripe/sdk';
 import { getServerConfig } from '@safeoutput/lib/server/env/runtime';
