@@ -18,9 +18,7 @@ export function setupClientEnvironment(env: Record<string, unknown>) {
     return;
   }
 
-  console.log('→ Initializing client environment...');
   clientEnv = parse(env);
-  console.log('✔ Client environment ready');
 }
 
 /**
@@ -33,7 +31,6 @@ export function setupClientEnvironment(env: Record<string, unknown>) {
 function parse(env: Record<string, unknown>): IClientEnvSchema {
   try {
     const parsed = clientEnvSchema.parse(env);
-    console.log('✔ Client environment variables validated');
     return parsed;
   } catch (err) {
     console.error('✘ Failed to validate client environment');
