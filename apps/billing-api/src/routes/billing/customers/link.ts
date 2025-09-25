@@ -3,7 +3,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
 export default async function registerRoute(fastify: FastifyInstance) {
   fastify.get(
-    '/register',
+    '/link',
     {
       preHandler: requireSecretMiddleware(),
     },
