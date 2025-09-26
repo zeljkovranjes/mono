@@ -68,6 +68,46 @@ export async function getPlanById(id: string): Promise<Plan | null> {
 }
 
 /**
+ * Get a plan by Stripe price ID.
+ *
+ * @example
+ * ```ts
+ * const plan = await getPlanByPriceId("price_123");
+ * ```
+ *
+ * @internal
+ */
+export async function getPlanByPriceId(stripePriceId: string): Promise<Plan | null> {
+  const plan = await db
+    .selectFrom('plan')
+    .selectAll()
+    .where('stripe_price_id', '=', stripePriceId)
+    .executeTakeFirst();
+
+  return plan ? PlanSchema.parse(plan) : null;
+}
+
+/**
+ * Get a plan by Stripe product ID.
+ *
+ * @example
+ * ```ts
+ * const plan = await getPlanByProductId("prod_456");
+ * ```
+ *
+ * @internal
+ */
+export async function getPlanByProductId(stripeProductId: string): Promise<Plan | null> {
+  const plan = await db
+    .selectFrom('plan')
+    .selectAll()
+    .where('stripe_product_id', '=', stripeProductId)
+    .executeTakeFirst();
+
+  return plan ? PlanSchema.parse(plan) : null;
+}
+
+/**
  * List all plans (with pagination).
  *
  * @example
