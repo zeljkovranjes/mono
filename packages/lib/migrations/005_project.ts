@@ -3,8 +3,6 @@ import type { Kysely } from 'kysely';
 import { sql } from 'kysely';
 
 export async function up(db: Kysely<any>): Promise<void> {
-  // Assumes pgcrypto + set_updated_at() were created earlier.
-
   await db.schema
     .createTable('project')
     .addColumn('id', 'uuid', (col) => col.primaryKey().defaultTo(sql`gen_random_uuid()`))
