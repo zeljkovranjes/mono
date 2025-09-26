@@ -219,6 +219,9 @@ importers:
       '@ory/client':
         specifier: ^1.22.2
         version: 1.22.2
+      '@safeoutput/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       dotenv:
         specifier: ^17.2.2
         version: 17.2.2
