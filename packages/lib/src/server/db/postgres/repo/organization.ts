@@ -1,14 +1,13 @@
-import { randomUUID } from 'crypto';
-import { nanoid } from 'nanoid';
-import { db } from '..';
-import { JsonObject } from '../../types/pg-database-types';
-
 import {
   Organization,
   CreateOrganization,
   OrganizationSchema,
   UpdateOrganization,
 } from '@safeoutput/contracts/organization/schema';
+import { randomUUID } from 'crypto';
+import { nanoid } from 'nanoid';
+import { db } from '..';
+import { JsonObject } from '../../types/pg-database-types';
 
 /**
  * Create a new organization.
