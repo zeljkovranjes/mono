@@ -157,7 +157,7 @@ export async function removeOrganizationMember(data: RemoveMember): Promise<bool
  *
  * @internal
  *
- * @deprecated use ory keto to check.
+ * @deprecated use ory keto to check. if you are being cost efficient then use below.
  */
 export async function isUserInOrganization(
   organizationId: string,
