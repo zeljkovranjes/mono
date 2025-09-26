@@ -1,6 +1,7 @@
 import { Kysely, PostgresDialect } from 'kysely';
 import { getServerConfig, setupServerEnvironment } from '../env/runtime';
 import { Pool } from 'pg';
+import { DB } from './types/pg-database-types';
 
 /**
  * Creates and returns a configured Postgres dialect for Kysely.
@@ -31,6 +32,10 @@ export function getPostgresDialect(for_migratons: boolean) {
     }),
   });
 }
+
+export const db = new Kysely<DB>({
+  dialect: getPostgresDialect(false),
+});
 
 /*
 export const db = new Kysely<DB>({
