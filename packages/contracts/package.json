@@ -11,7 +11,7 @@
     "./plan/contract": "./src/plan/contract.ts",
     "./project/schema": "./src/project/schema.ts",
     "./project/contract": "./src/project/contract.ts",
-    "./*": "./src/*.tsx"
+    "./*": "./src/*.ts"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
