@@ -246,6 +246,9 @@ importers:
       stripe:
         specifier: ^18.5.0
         version: 18.5.0(@types/node@22.15.3)
+      tsx:
+        specifier: ^4.20.5
+        version: 4.20.5
       zod:
         specifier: ^4.1.11
         version: 4.1.11
