@@ -42,7 +42,8 @@ export const CreateOrganizationSchema = z.object({
     .string()
     .min(1)
     .max(255)
-    .regex(/^[a-z0-9-]+$/),
+    .regex(/^[a-z0-9-]+$/)
+    .optional(),
   type: OrganizationTypeSchema,
   metadata: z.record(z.string(), z.unknown()).optional().default({}),
   current_plan_id: z.uuid().optional(),
