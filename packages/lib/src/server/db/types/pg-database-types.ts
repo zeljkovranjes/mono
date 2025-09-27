@@ -75,10 +75,17 @@ export interface Project {
   updated_at: Generated<Timestamp>;
 }
 
+export interface ProjectMember {
+  id: Generated<string>;
+  project_id: string;
+  user_id: string;
+}
+
 export interface DB {
   audit_log: AuditLog;
   organization: Organization;
   organization_member: OrganizationMember;
   plan: Plan;
   project: Project;
+  project_member: ProjectMember;
 }
