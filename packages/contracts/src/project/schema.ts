@@ -23,13 +23,11 @@ export const UpdateProjectSchema = z.object({
 export const ProjectMemberSchema = z.object({
   id: z.uuid(),
   project_id: z.uuid(),
-  organization_id: z.uuid(),
   user_id: z.uuid(),
 });
 
 export const CreateProjectMemberSchema = z.object({
   project_id: z.uuid(),
-  organization_id: z.uuid(),
   user_id: z.uuid(),
 });
 
