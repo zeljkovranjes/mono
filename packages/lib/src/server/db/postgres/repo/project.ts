@@ -66,6 +66,29 @@ export async function getProjectById(id: string): Promise<Project | null> {
 }
 
 /**
+ * Get the organization ID for a given project.
+ *
+ * @example
+ * ```ts
+ * const orgId = await getOrganizationIdByProject("f47ac10b-58cc-4372-a567-0e02b2c3d479");
+ * if (orgId) {
+ *   console.log("Organization:", orgId);
+ * }
+ * ```
+ *
+ * @internal
+ */
+export async function getOrganizationIdByProject(projectId: string): Promise<string | null> {
+  const row = await db
+    .selectFrom('project')
+    .select('organization_id')
+    .where('id', '=', projectId)
+    .executeTakeFirst();
+
+  return row?.organization_id ?? null;
+}
+
+/**
  * List projects for an organization (with pagination).
  *
  * @example
