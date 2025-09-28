@@ -1,6 +1,5 @@
 import { db } from '..';
 import { randomUUID } from 'crypto';
-import { JsonObject } from '../../types/pg-database-types';
 import {
   ProjectMember,
   ProjectMemberSchema,
