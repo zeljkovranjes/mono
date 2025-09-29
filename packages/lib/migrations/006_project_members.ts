@@ -1,4 +1,5 @@
-// migrations/000X_project_member.ts
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import type { Kysely } from 'kysely';
 import { sql } from 'kysely';
 
