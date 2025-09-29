@@ -1,4 +1,3 @@
-// src/server/services/organization.service.ts
 import {
   Organization,
   CreateOrganization,
