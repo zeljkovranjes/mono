@@ -17,6 +17,7 @@ import {
 
 import { addOrganizationMember } from '../db/postgres/repo/organizationMember.repo';
 import { createAuditLog } from '../db/postgres/repo/audit.repo';
+
 /**
  * Service: create a new organization and assign the creator as the first member.
  *
