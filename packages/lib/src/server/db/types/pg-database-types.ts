@@ -34,6 +34,23 @@ export interface AuditLog {
   id: Generated<string>;
 }
 
+export interface Invitation {
+  created_at: Generated<Timestamp>;
+  expires_at: Timestamp | null;
+  id: Generated<string>;
+  invitee_email: string;
+  invitee_user_id: string | null;
+  inviter_user_id: string;
+  metadata: Generated<Json>;
+  organization_id: string | null;
+  project_id: string | null;
+  role: string | null;
+  scope: string;
+  status: Generated<string>;
+  token: string;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface Organization {
   created_at: Generated<Timestamp>;
   current_plan_id: string | null;
@@ -83,6 +100,7 @@ export interface ProjectMember {
 
 export interface DB {
   audit_log: AuditLog;
+  invitation: Invitation;
   organization: Organization;
   organization_member: OrganizationMember;
   plan: Plan;
