@@ -20,7 +20,8 @@
     "check-types": "tsc --noEmit",
     "kysely:init": "kysely init",
     "kysely:codegen": "tsx src/scripts/pg-codegen.ts",
-    "kysely:migrate": "kysely migrate latest"
+    "kysely:migrate": "kysely migrate latest",
+    "test": "vitest run"
   },
   "devDependencies": {
     "@safeoutput/eslint-config": "workspace:*",
@@ -47,6 +48,7 @@
     "pino": "^9.11.0",
     "pino-pretty": "^13.1.1",
     "tsx": "^4.20.5",
+    "uuid": "^13.0.0",
     "zod": "^4.1.11"
   }
 }
