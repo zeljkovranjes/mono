@@ -4,23 +4,16 @@ import { sql } from 'kysely';
 export async function up(db: Kysely<any>): Promise<void> {
   await sql`CREATE EXTENSION IF NOT EXISTS pgcrypto`.execute(db);
 
-  // updated_at helper if missing
   await sql`
-    DO $$
+    CREATE OR REPLACE FUNCTION set_updated_at()
+    RETURNS TRIGGER AS $$
     BEGIN
-      IF NOT EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'set_updated_at') THEN
-        CREATE OR REPLACE FUNCTION set_updated_at()
-        RETURNS TRIGGER AS $$
-        BEGIN
-          NEW.updated_at = now();
-          RETURN NEW;
-        END;
-        $$ LANGUAGE plpgsql;
-      END IF;
-    END $$;
+      NEW.updated_at = now();
+      RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
   `.execute(db);
 
-  // Guard: project.organization_id must match invitation.organization_id (when both present)
   await sql`
     CREATE OR REPLACE FUNCTION ensure_invitation_project_org_match()
     RETURNS TRIGGER AS $$
@@ -32,16 +25,17 @@ export async function up(db: Kysely<any>): Promise<void> {
         IF proj_org IS NULL THEN
           RAISE EXCEPTION 'project % not found', NEW.project_id;
         END IF;
-        -- For project-scoped invites we accept NULL organization_id; for org-scoped both can't be set.
+
         IF NEW.scope = 'project' AND NEW.organization_id IS NOT NULL AND NEW.organization_id <> proj_org THEN
           RAISE EXCEPTION 'organization_id % does not match project.organization_id % for project %',
             NEW.organization_id, proj_org, NEW.project_id;
         END IF;
-        -- Normalize to project org when project scope and org_id is null
+
         IF NEW.scope = 'project' AND NEW.organization_id IS NULL THEN
           NEW.organization_id = proj_org;
         END IF;
       END IF;
+
       RETURN NEW;
     END;
     $$ LANGUAGE plpgsql;
@@ -50,16 +44,16 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable('invitation')
     .addColumn('id', 'uuid', (c) => c.primaryKey().defaultTo(sql`gen_random_uuid()`))
-    .addColumn('scope', 'varchar(32)', (c) => c.notNull())
+    .addColumn('scope', 'varchar(32)', (c) => c.notNull()) // 'organization' | 'project'
     .addColumn('organization_id', 'uuid')
     .addColumn('project_id', 'uuid')
     .addColumn('inviter_user_id', 'uuid', (c) => c.notNull())
     .addColumn('invitee_email', 'varchar(320)', (c) => c.notNull())
-    .addColumn('invitee_user_id', 'uuid') // nullable
-    .addColumn('role', 'varchar(64)') // nullable
+    .addColumn('invitee_user_id', 'uuid')
+    .addColumn('role', 'varchar(64)')
     .addColumn('token', 'varchar(255)', (c) => c.notNull().unique())
     .addColumn('status', 'varchar(32)', (c) => c.notNull().defaultTo('pending'))
-    .addColumn('expires_at', 'timestamp') // nullable
+    .addColumn('expires_at', 'timestamp')
     .addColumn('metadata', 'jsonb', (c) => c.notNull().defaultTo(sql`'{}'::jsonb`))
     .addColumn('created_at', 'timestamp', (c) => c.notNull().defaultTo(sql`now()`))
     .addColumn('updated_at', 'timestamp', (c) => c.notNull().defaultTo(sql`now()`))
