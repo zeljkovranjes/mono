@@ -21,6 +21,12 @@
       "cache": false,
       "persistent": true,
       "env": ["VITE_*"]
+    },
+    "test": {
+      "dependsOn": ["build"],
+      "inputs": ["$TURBO_DEFAULT$"],
+      "outputs": [],
+      "env": ["NODE_ENV", "VITE_*"]
     }
   }
 }
