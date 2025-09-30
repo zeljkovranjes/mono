@@ -5,13 +5,15 @@ import {
   UpdateOrganization,
 } from '@safeoutput/contracts/organization/schema';
 import { randomUUID } from 'crypto';
-import { nanoid } from 'nanoid';
+import { customAlphabet, nanoid } from 'nanoid';
 import { db } from '..';
 import { JsonObject } from '../../types/pg-database-types';
 import type { Kysely, Transaction } from 'kysely';
 import type { DB } from '../../types/pg-database-types';
 
 type Executor = Kysely<DB> | Transaction<DB>;
+
+const safeNanoid = customAlphabet('abcdefghijklmnopqrstuvwxyz0123456789-', 12);
 
 /**
  * Create a new organization.
@@ -30,7 +32,7 @@ export async function createOrganization(
     .values({
       id: randomUUID(),
       name: org.name,
-      slug: org.slug ?? nanoid(),
+      slug: safeNanoid(),
       type: org.type,
       metadata: (org.metadata ?? {}) as JsonObject,
       current_plan_id: org.current_plan_id ?? null,
