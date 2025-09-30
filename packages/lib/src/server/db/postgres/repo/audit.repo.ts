@@ -9,6 +9,13 @@ import {
   CreateAuditLogSchema,
 } from '@safeoutput/contracts/audit/schema';
 
+function normalizeAuditLog(log: any): any {
+  return {
+    ...log,
+    created_at: log.created_at instanceof Date ? log.created_at.toISOString() : log.created_at,
+  };
+}
+
 /**
  * Create a new audit log entry.
  *
@@ -26,27 +33,22 @@ import {
  *
  * @internal
  */
-export async function createAuditLog(data: CreateAuditLog): Promise<AuditLog> {
-  CreateAuditLogSchema.parse(data);
-
-  const now = new Date().toISOString();
-
+export async function createAuditLog(input: CreateAuditLog): Promise<AuditLog> {
   const log = await db
     .insertInto('audit_log')
     .values({
       id: randomUUID(),
-      actor_id: data.actor_id ?? null,
-      entity_type: data.entity_type,
-      entity_id: data.entity_id,
-      event_type: data.event_type,
-      diff: data.diff as JsonObject,
-      context: (data.context ?? {}) as JsonObject,
-      created_at: now,
+      actor_id: input.actor_id ?? null,
+      entity_type: input.entity_type,
+      entity_id: input.entity_id,
+      event_type: input.event_type,
+      diff: JSON.stringify(input.diff),
+      context: JSON.stringify(input.context ?? {}),
     })
     .returningAll()
     .executeTakeFirstOrThrow();
 
-  return AuditLogSchema.parse(log);
+  return AuditLogSchema.parse(normalizeAuditLog(log));
 }
 
 /**
@@ -62,7 +64,8 @@ export async function createAuditLog(data: CreateAuditLog): Promise<AuditLog> {
 export async function getAuditLogById(id: string): Promise<AuditLog | null> {
   const log = await db.selectFrom('audit_log').selectAll().where('id', '=', id).executeTakeFirst();
 
-  return log ? AuditLogSchema.parse(log) : null;
+  if (!log) return null;
+  return AuditLogSchema.parse(normalizeAuditLog(log));
 }
 
 /**
@@ -75,16 +78,16 @@ export async function getAuditLogById(id: string): Promise<AuditLog | null> {
  *
  * @internal
  */
-export async function listAuditLogs(limit = 50, offset = 0): Promise<AuditLog[]> {
-  const rows = await db
+export async function listAuditLogs(limit: number, offset: number): Promise<AuditLog[]> {
+  const logs = await db
     .selectFrom('audit_log')
     .selectAll()
+    .orderBy('created_at', 'desc')
     .limit(limit)
     .offset(offset)
-    .orderBy('created_at', 'desc')
     .execute();
 
-  return rows.map((row) => AuditLogSchema.parse(row));
+  return logs.map((log) => AuditLogSchema.parse(normalizeAuditLog(log)));
 }
 
 /**
@@ -100,22 +103,21 @@ export async function listAuditLogs(limit = 50, offset = 0): Promise<AuditLog[]>
 export async function listAuditLogsForEntity(
   entityType: string,
   entityId: string,
-  limit = 50,
-  offset = 0,
+  limit: number,
+  offset: number,
 ): Promise<AuditLog[]> {
-  const rows = await db
+  const logs = await db
     .selectFrom('audit_log')
     .selectAll()
     .where('entity_type', '=', entityType)
     .where('entity_id', '=', entityId)
+    .orderBy('created_at', 'desc')
     .limit(limit)
     .offset(offset)
-    .orderBy('created_at', 'desc')
     .execute();
 
-  return rows.map((row) => AuditLogSchema.parse(row));
+  return logs.map((log) => AuditLogSchema.parse(normalizeAuditLog(log)));
 }
-
 /**
  * List audit logs by actor.
  *
@@ -128,17 +130,17 @@ export async function listAuditLogsForEntity(
  */
 export async function listAuditLogsByActor(
   actorId: string,
-  limit = 50,
-  offset = 0,
+  limit: number,
+  offset: number,
 ): Promise<AuditLog[]> {
-  const rows = await db
+  const logs = await db
     .selectFrom('audit_log')
     .selectAll()
     .where('actor_id', '=', actorId)
+    .orderBy('created_at', 'desc')
     .limit(limit)
     .offset(offset)
-    .orderBy('created_at', 'desc')
     .execute();
 
-  return rows.map((row) => AuditLogSchema.parse(row));
+  return logs.map((log) => AuditLogSchema.parse(normalizeAuditLog(log)));
 }
