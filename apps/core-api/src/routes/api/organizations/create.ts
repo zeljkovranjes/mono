@@ -6,6 +6,7 @@ import { createOrganizationWithOwner } from '@safeoutput/lib/server/service/orga
 import { AppError, toOkResponse } from '@safeoutput/lib/shared/utils/response';
 import { OrganizationsContract } from '@safeoutput/contracts/organization/contract';
 import { requireAuthMiddleware } from '@safeoutput/lib/server/auth/middleware/fastify';
+import { getOryRelationships } from '@safeoutput/lib/server/auth/ory';
 
 const createOrganizationRoute: FastifyPluginAsync = async (fastify) => {
   const contract = OrganizationsContract.create;
@@ -23,6 +24,15 @@ const createOrganizationRoute: FastifyPluginAsync = async (fastify) => {
         const { current_plan_id, metadata, ...safeBody } = request.body;
 
         const organization = await createOrganizationWithOwner(userId, safeBody);
+
+        await getOryRelationships().createRelationship({
+          createRelationshipBody: {
+            namespace: 'Organization',
+            object: organization.id,
+            relation: 'admins',
+            subject_id: userId,
+          },
+        });
 
         return reply
           .code(201)
