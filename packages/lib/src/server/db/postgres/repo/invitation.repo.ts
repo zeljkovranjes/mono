@@ -12,6 +12,24 @@ import {
   UpdateInvitationSchema,
 } from '@safeoutput/contracts/invitation/schema';
 
+function normalizeInvitation(invitation: any): any {
+  return {
+    ...invitation,
+    created_at:
+      invitation.created_at instanceof Date
+        ? invitation.created_at.toISOString()
+        : invitation.created_at,
+    updated_at:
+      invitation.updated_at instanceof Date
+        ? invitation.updated_at.toISOString()
+        : invitation.updated_at,
+    expires_at:
+      invitation.expires_at instanceof Date
+        ? invitation.expires_at.toISOString()
+        : invitation.expires_at,
+  };
+}
+
 /**
  * Create a new invitation.
  *
@@ -53,7 +71,7 @@ export async function createInvitation(data: CreateInvitation): Promise<Invitati
     .returningAll()
     .executeTakeFirstOrThrow();
 
-  return InvitationSchema.parse(newInvitation);
+  return InvitationSchema.parse(normalizeInvitation(newInvitation));
 }
 
 /**
@@ -68,7 +86,7 @@ export async function createInvitation(data: CreateInvitation): Promise<Invitati
  */
 export async function getInvitationById(id: string): Promise<Invitation | null> {
   const row = await db.selectFrom('invitation').selectAll().where('id', '=', id).executeTakeFirst();
-  return row ? InvitationSchema.parse(row) : null;
+  return row ? InvitationSchema.parse(normalizeInvitation(row)) : null;
 }
 
 /**
@@ -88,7 +106,7 @@ export async function getInvitationByToken(token: string): Promise<Invitation | 
     .where('token', '=', token)
     .executeTakeFirst();
 
-  return row ? InvitationSchema.parse(row) : null;
+  return row ? InvitationSchema.parse(normalizeInvitation(row)) : null;
 }
 
 /**
@@ -115,7 +133,7 @@ export async function listInvitationsByOrganization(
     .orderBy('created_at', 'desc')
     .execute();
 
-  return rows.map((row) => InvitationSchema.parse(row));
+  return rows.map((row) => InvitationSchema.parse(normalizeInvitation(row)));
 }
 
 /**
@@ -142,7 +160,7 @@ export async function listInvitationsByProject(
     .orderBy('created_at', 'desc')
     .execute();
 
-  return rows.map((row) => InvitationSchema.parse(row));
+  return rows.map((row) => InvitationSchema.parse(normalizeInvitation(row)));
 }
 
 /**
@@ -175,7 +193,7 @@ export async function updateInvitation(
     .returningAll()
     .executeTakeFirst();
 
-  return updated ? InvitationSchema.parse(updated) : null;
+  return updated ? InvitationSchema.parse(normalizeInvitation(updated)) : null;
 }
 
 /**
