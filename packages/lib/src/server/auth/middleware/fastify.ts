@@ -22,7 +22,7 @@ export async function requireAuthMiddleware(req: FastifyRequest, reply: FastifyR
     const { data: session } = await frontend.toSession({ cookie: cookieHeader });
     (req as any).session = session;
   } catch {
-    reply.redirect(`${getOryBaseUrl()}/self-service/login/browser`, 302);
+    return reply.status(401).send({ error: 'Unauthorized', message: 'You must be logged in' });
   }
 }
 
@@ -41,11 +41,12 @@ export async function requireNoAuthMiddleware(
   const cookieHeader = req.headers.cookie ?? '';
 
   try {
-    // If session exists, redirect user away
     await frontend.toSession({ cookie: cookieHeader });
-    reply.redirect(redirectTo, 302);
+    // If session exists → block
+    return reply.redirect(redirectTo, 302);
   } catch {
-    // No session → continue to route handler
+    // No session → allow
+    return;
   }
 }
 
@@ -77,28 +78,21 @@ export async function setSession(req: FastifyRequest, reply: FastifyReply) {
 
   try {
     const { data: session } = await frontend.toSession({ cookie: cookieHeader });
-
-    // Attach session to request for downstream handlers
     (req as any).session = session;
   } catch (err: any) {
     const baseUrl = getOryBaseUrl();
     if (!baseUrl) {
-      reply.code(500).send('Server misconfigured: missing Ory base URL');
-      return;
+      return reply.code(500).send('Server misconfigured: missing Ory base URL');
     }
 
-    // Check if error means 2FA is required
     const redirectUrl = maybeInitiate2FA(baseUrl, pathname + search, err);
     if (redirectUrl) {
-      reply.redirect(redirectUrl);
-      return;
+      return reply.redirect(redirectUrl);
     }
 
-    // Otherwise redirect to login
-    reply.redirect(`${baseUrl}/self-service/login/browser`);
+    return reply.redirect(`${baseUrl}/self-service/login/browser`);
   }
 }
-
 /**
  * Middleware that requires a valid Ory session and a Keto permission check
  * before letting the request continue.
@@ -117,14 +111,10 @@ export function requirePermissionMiddleware(
     const cookieHeader = req.headers.cookie ?? '';
 
     try {
-      // 1. Validate session
       const { data: session } = await frontend.toSession({ cookie: cookieHeader });
       (req as any).session = session;
 
-      // 2. Resolve object dynamically
       const objectId = await objectResolver(req);
-
-      // 3. Check permission in Keto
       const { data: result } = await permissions.checkPermission({
         subjectId: session.identity!.id,
         relation,
@@ -175,8 +165,8 @@ export function requireSecretMiddleware(expectedSecret?: string) {
 
     if (provided !== secretToCheck) {
       return reply.status(403).send({
-        error: 'Unauthorized',
-        message: 'Missing or malformed Authorization header',
+        error: 'Forbidden',
+        message: 'Invalid secret key',
       });
     }
   };
