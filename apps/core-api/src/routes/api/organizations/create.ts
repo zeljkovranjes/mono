@@ -1,3 +1,5 @@
+// POST /api/organizations
+
 import { FastifyPluginAsync } from 'fastify';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { createOrganizationWithOwner } from '@safeoutput/lib/server/service/organization.service';
