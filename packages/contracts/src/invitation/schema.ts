@@ -10,7 +10,7 @@ export const InvitationSchema = z
     organization_id: z.uuid().nullable(), // required when scope=organization
     project_id: z.uuid().nullable(), // required when scope=project
     inviter_user_id: z.uuid(), // Ory identity
-    invitee_email: z.string().email().max(320),
+    invitee_email: z.email().max(320),
     invitee_user_id: z.uuid().nullable(), // set on acceptance (if the email maps to a user)
     role: z.string().max(64).nullable(), // e.g., 'owner'|'admin'|'member'|'viewer'
     token: z.string().min(16).max(255), // secure random string
