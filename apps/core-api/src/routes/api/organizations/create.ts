@@ -17,12 +17,10 @@ const createOrganizationRoute: FastifyPluginAsync = async (fastify) => {
       const session = (request as any).session;
       const userId = session?.identity?.id;
 
-      if (!userId) {
-        throw AppError.unauthorized('User session is required', '/api/organizations');
-      }
-
       try {
-        const organization = await createOrganizationWithOwner(userId, request.body);
+        const { current_plan_id, metadata, ...safeBody } = request.body;
+
+        const organization = await createOrganizationWithOwner(userId, safeBody);
 
         return reply
           .code(201)
