@@ -3,18 +3,22 @@ import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { createOrganizationWithOwner } from '@safeoutput/lib/server/service/organization.service';
 import { AppError, toOkResponse } from '@safeoutput/lib/shared/utils/response';
 import { OrganizationsContract } from '@safeoutput/contracts/organization/contract';
+import { requireAuthMiddleware, setSession } from '@safeoutput/lib/server/auth/middleware/fastify';
 
 const createOrganizationRoute: FastifyPluginAsync = async (fastify) => {
   const contract = OrganizationsContract.create;
 
   fastify.withTypeProvider<ZodTypeProvider>().route({
     method: contract.method,
-    url: '/', // because the file lives under routes/api/organizations
+    url: '/',
     schema: contract.schema,
+    preHandler: [requireAuthMiddleware],
     handler: async (request, reply) => {
-      const userId = request.headers['x-user-id'];
-      if (!userId || typeof userId !== 'string') {
-        throw AppError.unauthorized('User ID is required', '/api/organizations');
+      const session = (request as any).session;
+      const userId = session?.identity?.id;
+
+      if (!userId) {
+        throw AppError.unauthorized('User session is required', '/api/organizations');
       }
 
       try {
