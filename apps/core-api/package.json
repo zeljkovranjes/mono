@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@fastify/autoload": "^6.3.1",
+    "@fastify/cors": "^11.1.0",
     "@ory/client": "^1.22.2",
     "@safeoutput/contracts": "workspace:*",
     "@safeoutput/lib": "workspace:*",
