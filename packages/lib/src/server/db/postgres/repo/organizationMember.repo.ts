@@ -10,6 +10,7 @@ import {
   OrganizationSchema,
 } from '@safeoutput/contracts/organization/schema';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function normalizeMember(member: any): any {
   return {
     ...member,
@@ -20,6 +21,7 @@ function normalizeMember(member: any): any {
   };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function normalizeOrg(org: any): any {
   return {
     ...org,

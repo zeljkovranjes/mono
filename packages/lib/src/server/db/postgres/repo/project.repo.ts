@@ -11,6 +11,7 @@ import {
   UpdateProjectSchema,
 } from '@safeoutput/contracts/project/schema';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function normalizeProject(row: any): Project {
   return {
     ...row,

@@ -12,6 +12,7 @@ import {
   UpdateInvitationSchema,
 } from '@safeoutput/contracts/invitation/schema';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function normalizeInvitation(invitation: any): any {
   return {
     ...invitation,

@@ -28,7 +28,7 @@ export const config = [
     },
   },
   {
-    ignores: ['dist/**', '.vinxi/**', '.output/**'],
+    ignores: ['dist/**', '.vinxi/**', '.output/**', 'src/tests/**'],
   },
 
   // --- Fence: prevent server imports in client code ---

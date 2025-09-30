@@ -11,6 +11,7 @@ import {
   UpdatePlanSchema,
 } from '@safeoutput/contracts/plan/schema';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function normalizePlan(plan: any): any {
   return {
     ...plan,

@@ -1,14 +1,9 @@
 import { db } from '..';
 import { randomUUID } from 'crypto';
-import type { JsonObject } from '../../types/pg-database-types';
 
-import {
-  AuditLog,
-  AuditLogSchema,
-  CreateAuditLog,
-  CreateAuditLogSchema,
-} from '@safeoutput/contracts/audit/schema';
+import { AuditLog, AuditLogSchema, CreateAuditLog } from '@safeoutput/contracts/audit/schema';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function normalizeAuditLog(log: any): any {
   return {
     ...log,
