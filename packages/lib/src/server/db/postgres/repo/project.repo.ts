@@ -11,6 +11,14 @@ import {
   UpdateProjectSchema,
 } from '@safeoutput/contracts/project/schema';
 
+export function normalizeProject(row: any): Project {
+  return {
+    ...row,
+    created_at: row.created_at instanceof Date ? row.created_at.toISOString() : row.created_at,
+    updated_at: row.updated_at instanceof Date ? row.updated_at.toISOString() : row.updated_at,
+  };
+}
+
 /**
  * Create a new project.
  *
@@ -42,7 +50,7 @@ export async function createProject(data: CreateProject): Promise<Project> {
     .returningAll()
     .executeTakeFirstOrThrow();
 
-  return ProjectSchema.parse(newProject);
+  return ProjectSchema.parse(normalizeProject(newProject));
 }
 
 /**
@@ -61,10 +69,8 @@ export async function getProjectById(id: string): Promise<Project | null> {
     .selectAll()
     .where('id', '=', id)
     .executeTakeFirst();
-
-  return project ? ProjectSchema.parse(project) : null;
+  return project ? ProjectSchema.parse(normalizeProject(project)) : null;
 }
-
 /**
  * Get the organization ID for a given project.
  *
@@ -112,7 +118,7 @@ export async function listProjectsByOrganization(
     .orderBy('created_at', 'desc')
     .execute();
 
-  return rows.map((row) => ProjectSchema.parse(row));
+  return rows.map((row) => ProjectSchema.parse(normalizeProject(row)));
 }
 
 /**
@@ -141,7 +147,7 @@ export async function updateProject(id: string, data: UpdateProject): Promise<Pr
     .returningAll()
     .executeTakeFirst();
 
-  return updated ? ProjectSchema.parse(updated) : null;
+  return updated ? ProjectSchema.parse(normalizeProject(updated)) : null;
 }
 
 /**

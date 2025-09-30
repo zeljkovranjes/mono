@@ -11,6 +11,14 @@ import {
   UpdatePlanSchema,
 } from '@safeoutput/contracts/plan/schema';
 
+function normalizePlan(plan: any): any {
+  return {
+    ...plan,
+    created_at: plan.created_at instanceof Date ? plan.created_at.toISOString() : plan.created_at,
+    updated_at: plan.updated_at instanceof Date ? plan.updated_at.toISOString() : plan.updated_at,
+  };
+}
+
 /**
  * Create a new plan.
  *
@@ -28,27 +36,26 @@ import {
  * @internal
  */
 export async function createPlan(data: CreatePlan): Promise<Plan> {
-  CreatePlanSchema.parse(data);
-
+  const validated = CreatePlanSchema.parse(data);
   const now = new Date().toISOString();
 
   const newPlan = await db
     .insertInto('plan')
     .values({
       id: randomUUID(),
-      name: data.name,
-      description: data.description ?? null,
-      stripe_price_id: data.stripe_price_id,
-      stripe_product_id: data.stripe_product_id,
-      price_per_month: data.price_per_month,
-      metadata: (data.metadata ?? {}) as JsonObject,
+      name: validated.name,
+      description: validated.description ?? null,
+      stripe_price_id: validated.stripe_price_id,
+      stripe_product_id: validated.stripe_product_id,
+      price_per_month: validated.price_per_month,
+      metadata: (validated.metadata ?? {}) as JsonObject,
       created_at: now,
       updated_at: now,
     })
     .returningAll()
     .executeTakeFirstOrThrow();
 
-  return PlanSchema.parse(newPlan);
+  return PlanSchema.parse(normalizePlan(newPlan));
 }
 
 /**
@@ -62,11 +69,9 @@ export async function createPlan(data: CreatePlan): Promise<Plan> {
  * @internal
  */
 export async function getPlanById(id: string): Promise<Plan | null> {
-  const plan = await db.selectFrom('plan').selectAll().where('id', '=', id).executeTakeFirst();
-
-  return plan ? PlanSchema.parse(plan) : null;
+  const row = await db.selectFrom('plan').selectAll().where('id', '=', id).executeTakeFirst();
+  return row ? PlanSchema.parse(normalizePlan(row)) : null;
 }
-
 /**
  * Get a plan by Stripe price ID.
  *
@@ -78,13 +83,12 @@ export async function getPlanById(id: string): Promise<Plan | null> {
  * @internal
  */
 export async function getPlanByPriceId(stripePriceId: string): Promise<Plan | null> {
-  const plan = await db
+  const row = await db
     .selectFrom('plan')
     .selectAll()
     .where('stripe_price_id', '=', stripePriceId)
     .executeTakeFirst();
-
-  return plan ? PlanSchema.parse(plan) : null;
+  return row ? PlanSchema.parse(normalizePlan(row)) : null;
 }
 
 /**
@@ -98,13 +102,12 @@ export async function getPlanByPriceId(stripePriceId: string): Promise<Plan | nu
  * @internal
  */
 export async function getPlanByProductId(stripeProductId: string): Promise<Plan | null> {
-  const plan = await db
+  const row = await db
     .selectFrom('plan')
     .selectAll()
     .where('stripe_product_id', '=', stripeProductId)
     .executeTakeFirst();
-
-  return plan ? PlanSchema.parse(plan) : null;
+  return row ? PlanSchema.parse(normalizePlan(row)) : null;
 }
 
 /**
@@ -125,8 +128,7 @@ export async function listPlans(limit = 50, offset = 0): Promise<Plan[]> {
     .offset(offset)
     .orderBy('created_at', 'desc')
     .execute();
-
-  return rows.map((row) => PlanSchema.parse(row));
+  return rows.map((row) => PlanSchema.parse(normalizePlan(row)));
 }
 
 /**
@@ -142,24 +144,26 @@ export async function listPlans(limit = 50, offset = 0): Promise<Plan[]> {
  * @internal
  */
 export async function updatePlan(id: string, data: UpdatePlan): Promise<Plan | null> {
-  UpdatePlanSchema.parse(data);
+  const validated = UpdatePlanSchema.parse(data);
 
   const updated = await db
     .updateTable('plan')
     .set({
-      ...(data.name && { name: data.name }),
-      ...(data.description !== undefined && { description: data.description }),
-      ...(data.stripe_price_id && { stripe_price_id: data.stripe_price_id }),
-      ...(data.stripe_product_id && { stripe_product_id: data.stripe_product_id }),
-      ...(data.price_per_month !== undefined && { price_per_month: data.price_per_month }),
-      ...(data.metadata && { metadata: data.metadata as JsonObject }),
+      ...(validated.name && { name: validated.name }),
+      ...(validated.description !== undefined && { description: validated.description }),
+      ...(validated.stripe_price_id && { stripe_price_id: validated.stripe_price_id }),
+      ...(validated.stripe_product_id && { stripe_product_id: validated.stripe_product_id }),
+      ...(validated.price_per_month !== undefined && {
+        price_per_month: validated.price_per_month,
+      }),
+      ...(validated.metadata && { metadata: validated.metadata as JsonObject }),
       updated_at: new Date().toISOString(),
     })
     .where('id', '=', id)
     .returningAll()
     .executeTakeFirst();
 
-  return updated ? PlanSchema.parse(updated) : null;
+  return updated ? PlanSchema.parse(normalizePlan(updated)) : null;
 }
 
 /**
