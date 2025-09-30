@@ -2,6 +2,8 @@
 import { db } from '..';
 import { randomUUID } from 'crypto';
 import type { JsonObject } from '../../types/pg-database-types';
+import type { Kysely, Transaction } from 'kysely';
+import type { DB } from '../../types/pg-database-types';
 
 import {
   Invitation,
@@ -11,6 +13,8 @@ import {
   UpdateInvitation,
   UpdateInvitationSchema,
 } from '@safeoutput/contracts/invitation/schema';
+
+type Executor = Kysely<DB> | Transaction<DB>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function normalizeInvitation(invitation: any): any {
@@ -34,24 +38,19 @@ function normalizeInvitation(invitation: any): any {
 /**
  * Create a new invitation.
  *
- * @example
- * ```ts
- * const invite = await createInvitation({
- *   scope: "organization",
- *   organization_id: "org-uuid",
- *   inviter_user_id: "user-uuid",
- *   invitee_email: "test@example.com",
- *   token: "secureRandomToken",
- * });
- * ```
- *
  * @internal
+ * @param data - The invitation creation payload.
+ * @param executor - Optional transaction or database instance (defaults to global db).
+ * @returns The newly created invitation.
  */
-export async function createInvitation(data: CreateInvitation): Promise<Invitation> {
+export async function createInvitation(
+  data: CreateInvitation,
+  executor: Executor = db,
+): Promise<Invitation> {
   const validated = CreateInvitationSchema.parse(data);
   const now = new Date().toISOString();
 
-  const newInvitation = await db
+  const newInvitation = await executor
     .insertInto('invitation')
     .values({
       id: randomUUID(),
@@ -78,30 +77,37 @@ export async function createInvitation(data: CreateInvitation): Promise<Invitati
 /**
  * Get an invitation by ID.
  *
- * @example
- * ```ts
- * const invite = await getInvitationById("inv-uuid");
- * ```
- *
  * @internal
+ * @param id - The invitation ID.
+ * @param executor - Optional transaction or database instance (defaults to global db).
+ * @returns The invitation if found, otherwise null.
  */
-export async function getInvitationById(id: string): Promise<Invitation | null> {
-  const row = await db.selectFrom('invitation').selectAll().where('id', '=', id).executeTakeFirst();
+export async function getInvitationById(
+  id: string,
+  executor: Executor = db,
+): Promise<Invitation | null> {
+  const row = await executor
+    .selectFrom('invitation')
+    .selectAll()
+    .where('id', '=', id)
+    .executeTakeFirst();
+
   return row ? InvitationSchema.parse(normalizeInvitation(row)) : null;
 }
 
 /**
  * Get an invitation by token.
  *
- * @example
- * ```ts
- * const invite = await getInvitationByToken("secureRandomToken");
- * ```
- *
  * @internal
+ * @param token - The invitation token.
+ * @param executor - Optional transaction or database instance (defaults to global db).
+ * @returns The invitation if found, otherwise null.
  */
-export async function getInvitationByToken(token: string): Promise<Invitation | null> {
-  const row = await db
+export async function getInvitationByToken(
+  token: string,
+  executor: Executor = db,
+): Promise<Invitation | null> {
+  const row = await executor
     .selectFrom('invitation')
     .selectAll()
     .where('token', '=', token)
@@ -113,19 +119,20 @@ export async function getInvitationByToken(token: string): Promise<Invitation | 
 /**
  * List invitations for a specific organization.
  *
- * @example
- * ```ts
- * const invites = await listInvitationsByOrganization("org-uuid", 20, 0);
- * ```
- *
  * @internal
+ * @param organizationId - The organization ID.
+ * @param limit - Maximum number of invitations to return.
+ * @param offset - Number of invitations to skip before returning results.
+ * @param executor - Optional transaction or database instance (defaults to global db).
+ * @returns An array of invitations for the organization.
  */
 export async function listInvitationsByOrganization(
   organizationId: string,
   limit = 50,
   offset = 0,
+  executor: Executor = db,
 ): Promise<Invitation[]> {
-  const rows = await db
+  const rows = await executor
     .selectFrom('invitation')
     .selectAll()
     .where('organization_id', '=', organizationId)
@@ -140,19 +147,20 @@ export async function listInvitationsByOrganization(
 /**
  * List invitations for a specific project.
  *
- * @example
- * ```ts
- * const invites = await listInvitationsByProject("proj-uuid", 20, 0);
- * ```
- *
  * @internal
+ * @param projectId - The project ID.
+ * @param limit - Maximum number of invitations to return.
+ * @param offset - Number of invitations to skip before returning results.
+ * @param executor - Optional transaction or database instance (defaults to global db).
+ * @returns An array of invitations for the project.
  */
 export async function listInvitationsByProject(
   projectId: string,
   limit = 50,
   offset = 0,
+  executor: Executor = db,
 ): Promise<Invitation[]> {
-  const rows = await db
+  const rows = await executor
     .selectFrom('invitation')
     .selectAll()
     .where('project_id', '=', projectId)
@@ -167,20 +175,20 @@ export async function listInvitationsByProject(
 /**
  * Update an invitation.
  *
- * @example
- * ```ts
- * const updated = await updateInvitation("inv-uuid", { status: "accepted" });
- * ```
- *
  * @internal
+ * @param id - The invitation ID.
+ * @param data - Partial update payload for the invitation.
+ * @param executor - Optional transaction or database instance (defaults to global db).
+ * @returns The updated invitation if found, otherwise null.
  */
 export async function updateInvitation(
   id: string,
   data: UpdateInvitation,
+  executor: Executor = db,
 ): Promise<Invitation | null> {
   const validated = UpdateInvitationSchema.parse(data);
 
-  const updated = await db
+  const updated = await executor
     .updateTable('invitation')
     .set({
       ...(validated.status && { status: validated.status }),
@@ -200,14 +208,12 @@ export async function updateInvitation(
 /**
  * Delete an invitation by ID.
  *
- * @example
- * ```ts
- * const deleted = await deleteInvitation("inv-uuid");
- * ```
- *
  * @internal
+ * @param id - The invitation ID.
+ * @param executor - Optional transaction or database instance (defaults to global db).
+ * @returns True if the invitation was deleted, otherwise false.
  */
-export async function deleteInvitation(id: string): Promise<boolean> {
-  const res = await db.deleteFrom('invitation').where('id', '=', id).executeTakeFirst();
+export async function deleteInvitation(id: string, executor: Executor = db): Promise<boolean> {
+  const res = await executor.deleteFrom('invitation').where('id', '=', id).executeTakeFirst();
   return (res.numDeletedRows ?? 0) > 0;
 }

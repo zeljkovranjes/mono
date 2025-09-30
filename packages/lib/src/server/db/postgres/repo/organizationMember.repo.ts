@@ -1,4 +1,7 @@
 import { db } from '..';
+import type { Kysely, Transaction } from 'kysely';
+import type { DB } from '../../types/pg-database-types';
+
 import {
   OrganizationMember,
   OrganizationMemberSchema,
@@ -9,6 +12,8 @@ import {
   Organization,
   OrganizationSchema,
 } from '@safeoutput/contracts/organization/schema';
+
+type Executor = Kysely<DB> | Transaction<DB>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function normalizeMember(member: any): any {
@@ -35,25 +40,22 @@ function normalizeOrg(org: any): any {
 /**
  * Add a member to an organization.
  *
- * @example
- * ```ts
- * const member = await addOrganizationMember("org-id-uuid", {
- *   user_id: "user-id-uuid",
- * });
- * ```
- *
  * @internal
+ * @param organizationId - The organization ID.
+ * @param data - The member payload to add.
+ * @param executor - Optional transaction or database instance (defaults to global db).
+ * @returns The newly added organization member.
  */
 export async function addOrganizationMember(
   organizationId: string,
   data: AddMember,
+  executor: Executor = db,
 ): Promise<OrganizationMember> {
-  // Ensure valid input
   AddMemberSchema.parse(data);
 
   const now = new Date().toISOString();
 
-  const newMember = await db
+  const newMember = await executor
     .insertInto('organization_member')
     .values({
       organization_id: organizationId,
@@ -70,18 +72,18 @@ export async function addOrganizationMember(
 /**
  * Get a member record by organization and user ID.
  *
- * @example
- * ```ts
- * const member = await getOrganizationMember("org-id-uuid", "user-id-uuid");
- * ```
- *
  * @internal
+ * @param organizationId - The organization ID.
+ * @param userId - The user ID.
+ * @param executor - Optional transaction or database instance (defaults to global db).
+ * @returns The organization member if found, otherwise null.
  */
 export async function getOrganizationMember(
   organizationId: string,
   userId: string,
+  executor: Executor = db,
 ): Promise<OrganizationMember | null> {
-  const member = await db
+  const member = await executor
     .selectFrom('organization_member')
     .selectAll()
     .where('organization_id', '=', organizationId)
@@ -94,19 +96,20 @@ export async function getOrganizationMember(
 /**
  * List members of an organization.
  *
- * @example
- * ```ts
- * const members = await listOrganizationMembers("org-id-uuid");
- * ```
- *
  * @internal
+ * @param organizationId - The organization ID.
+ * @param limit - Maximum number of members to return.
+ * @param offset - Number of members to skip before returning results.
+ * @param executor - Optional transaction or database instance (defaults to global db).
+ * @returns An array of organization members.
  */
 export async function listOrganizationMembers(
   organizationId: string,
   limit = 50,
   offset = 0,
+  executor: Executor = db,
 ): Promise<OrganizationMember[]> {
-  const rows = await db
+  const rows = await executor
     .selectFrom('organization_member')
     .selectAll()
     .where('organization_id', '=', organizationId)
@@ -121,15 +124,16 @@ export async function listOrganizationMembers(
 /**
  * List all organizations that a user belongs to.
  *
- * @example
- * ```ts
- * const orgs = await listUserOrganizations("user-id-uuid");
- * ```
- *
  * @internal
+ * @param userId - The user ID.
+ * @param executor - Optional transaction or database instance (defaults to global db).
+ * @returns An array of organizations.
  */
-export async function listUserOrganizations(userId: string): Promise<Organization[]> {
-  const rows = await db
+export async function listUserOrganizations(
+  userId: string,
+  executor: Executor = db,
+): Promise<Organization[]> {
+  const rows = await executor
     .selectFrom('organization_member')
     .innerJoin('organization', 'organization.id', 'organization_member.organization_id')
     .selectAll('organization')
@@ -143,21 +147,18 @@ export async function listUserOrganizations(userId: string): Promise<Organizatio
 /**
  * Remove a member from an organization.
  *
- * @example
- * ```ts
- * const removed = await removeOrganizationMember({
- *   organization_id: "org-id-uuid",
- *   user_id: "user-id-uuid",
- * });
- * if (removed) console.log("Removed successfully");
- * ```
- *
  * @internal
+ * @param data - The removal payload (organization_id + user_id).
+ * @param executor - Optional transaction or database instance (defaults to global db).
+ * @returns True if the member was removed, otherwise false.
  */
-export async function removeOrganizationMember(data: RemoveMember): Promise<boolean> {
+export async function removeOrganizationMember(
+  data: RemoveMember,
+  executor: Executor = db,
+): Promise<boolean> {
   RemoveMemberSchema.parse(data);
 
-  const res = await db
+  const res = await executor
     .deleteFrom('organization_member')
     .where('organization_id', '=', data.organization_id)
     .where('user_id', '=', data.user_id)
@@ -169,20 +170,21 @@ export async function removeOrganizationMember(data: RemoveMember): Promise<bool
 /**
  * Check if a user is a member of an organization.
  *
- * @example
- * ```ts
- * const isMember = await isUserInOrganization("org-id-uuid", "user-id-uuid");
- * ```
- *
  * @internal
+ * @param organizationId - The organization ID.
+ * @param userId - The user ID.
+ * @param executor - Optional transaction or database instance (defaults to global db).
+ * @returns True if the user is a member of the organization, otherwise false.
  *
- * @deprecated use ory keto to check. if you are being cost efficient then use below.
+ * @deprecated Use Ory Keto for membership checks.
+ * If cost efficiency is a concern, this direct query can be used instead.
  */
 export async function isUserInOrganization(
   organizationId: string,
   userId: string,
+  executor: Executor = db,
 ): Promise<boolean> {
-  const res = await db
+  const res = await executor
     .selectFrom('organization_member')
     .selectAll()
     .where('organization_id', '=', organizationId)

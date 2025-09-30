@@ -1,4 +1,6 @@
 import { AuditLog, CreateAuditLog } from '@safeoutput/contracts/audit/schema';
+import type { Kysely, Transaction } from 'kysely';
+import type { DB } from '../db/types/pg-database-types';
 
 import {
   createAuditLog as createAuditLogRepo,
@@ -8,36 +10,28 @@ import {
   listAuditLogsByActor as listAuditLogsByActorRepo,
 } from '../db/postgres/repo/audit.repo';
 
+type Executor = Kysely<DB> | Transaction<DB>;
+
 /**
  * Service: create a new audit log entry.
  *
  * @param data - The audit log data to record.
+ * @param executor - Optional Kysely/Transaction executor (for wrapping in a transaction).
  * @returns The created AuditLog entry.
- *
- * @example
- * ```ts
- * const log = await createAuditLog({
- *   actor_id: "user-uuid",
- *   entity_type: "organization",
- *   entity_id: "org-uuid",
- *   event_type: "organization.updated",
- *   diff: { name: ["Old", "New"] },
- *   context: { ip: "127.0.0.1" },
- * });
- * ```
  */
-export async function createAuditLog(data: CreateAuditLog): Promise<AuditLog> {
-  return createAuditLogRepo(data);
+export async function createAuditLog(data: CreateAuditLog, executor?: Executor): Promise<AuditLog> {
+  return createAuditLogRepo(data, executor);
 }
 
 /**
  * Service: fetch an audit log entry by ID.
  *
  * @param id - The unique audit log ID.
+ * @param executor - Optional Kysely/Transaction executor.
  * @returns The AuditLog entry if found, otherwise null.
  */
-export async function getAuditLogById(id: string): Promise<AuditLog | null> {
-  return getAuditLogByIdRepo(id);
+export async function getAuditLogById(id: string, executor?: Executor): Promise<AuditLog | null> {
+  return getAuditLogByIdRepo(id, executor);
 }
 
 /**
@@ -45,10 +39,15 @@ export async function getAuditLogById(id: string): Promise<AuditLog | null> {
  *
  * @param limit - Maximum number of audit logs to return.
  * @param offset - Number of audit logs to skip before returning results.
+ * @param executor - Optional Kysely/Transaction executor.
  * @returns An array of AuditLog entries.
  */
-export async function listAuditLogs(limit = 50, offset = 0): Promise<AuditLog[]> {
-  return listAuditLogsRepo(limit, offset);
+export async function listAuditLogs(
+  limit = 50,
+  offset = 0,
+  executor?: Executor,
+): Promise<AuditLog[]> {
+  return listAuditLogsRepo(limit, offset, executor);
 }
 
 /**
@@ -58,6 +57,7 @@ export async function listAuditLogs(limit = 50, offset = 0): Promise<AuditLog[]>
  * @param entityId - The unique ID of the entity.
  * @param limit - Maximum number of audit logs to return.
  * @param offset - Number of audit logs to skip before returning results.
+ * @param executor - Optional Kysely/Transaction executor.
  * @returns An array of AuditLog entries.
  */
 export async function listAuditLogsForEntity(
@@ -65,8 +65,9 @@ export async function listAuditLogsForEntity(
   entityId: string,
   limit = 50,
   offset = 0,
+  executor?: Executor,
 ): Promise<AuditLog[]> {
-  return listAuditLogsForEntityRepo(entityType, entityId, limit, offset);
+  return listAuditLogsForEntityRepo(entityType, entityId, limit, offset, executor);
 }
 
 /**
@@ -75,12 +76,14 @@ export async function listAuditLogsForEntity(
  * @param actorId - The ID of the actor (e.g., a user).
  * @param limit - Maximum number of audit logs to return.
  * @param offset - Number of audit logs to skip before returning results.
+ * @param executor - Optional Kysely/Transaction executor.
  * @returns An array of AuditLog entries.
  */
 export async function listAuditLogsByActor(
   actorId: string,
   limit = 50,
   offset = 0,
+  executor?: Executor,
 ): Promise<AuditLog[]> {
-  return listAuditLogsByActorRepo(actorId, limit, offset);
+  return listAuditLogsByActorRepo(actorId, limit, offset, executor);
 }

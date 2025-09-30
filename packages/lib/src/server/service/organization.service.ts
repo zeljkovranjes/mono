@@ -16,6 +16,7 @@ import {
 
 import { addOrganizationMember } from '../db/postgres/repo/organizationMember.repo';
 import { createAuditLog } from '../db/postgres/repo/audit.repo';
+import { db } from '../db/postgres';
 
 /**
  * Service: create a new organization and assign the creator as the first member.
@@ -23,25 +24,39 @@ import { createAuditLog } from '../db/postgres/repo/audit.repo';
  * @param userId - The ID of the user who will own the organization.
  * @param data - The organization creation payload.
  * @returns The newly created organization.
+ *
+ * @example
+ * ```ts
+ * const org = await createOrganizationWithOwner("user-uuid", {
+ *   name: "Acme Inc",
+ *   slug: "acme-inc",
+ *   type: "Startup",
+ * });
+ * ```
  */
 export async function createOrganizationWithOwner(
   userId: string,
   data: CreateOrganization,
 ): Promise<Organization> {
-  const org = await createOrganization(data);
+  return db.transaction().execute(async (trx) => {
+    const org = await createOrganization(data, trx);
 
-  await addOrganizationMember(org.id, { user_id: userId });
+    await addOrganizationMember(org.id, { user_id: userId }, trx);
 
-  await createAuditLog({
-    actor_id: userId,
-    entity_type: 'organization',
-    entity_id: org.id,
-    event_type: 'organization.created',
-    diff: {},
-    context: {},
+    await createAuditLog(
+      {
+        actor_id: userId,
+        entity_type: 'organization',
+        entity_id: org.id,
+        event_type: 'organization.created',
+        diff: {},
+        context: {},
+      },
+      trx,
+    );
+
+    return org;
   });
-
-  return org;
 }
 
 /**
@@ -49,6 +64,12 @@ export async function createOrganizationWithOwner(
  *
  * @param id - The unique organization ID.
  * @returns The organization if found, otherwise null.
+ *
+ * @example
+ * ```ts
+ * const org = await getOrganization("org-uuid");
+ * if (org) console.log(org.name);
+ * ```
  */
 export async function getOrganization(id: string): Promise<Organization | null> {
   return getOrganizationById(id);
@@ -59,6 +80,11 @@ export async function getOrganization(id: string): Promise<Organization | null> 
  *
  * @param slug - The unique slug of the organization.
  * @returns The organization if found, otherwise null.
+ *
+ * @example
+ * ```ts
+ * const org = await getOrganizationBySlug("acme-inc");
+ * ```
  */
 export async function getOrganizationBySlug(slug: string): Promise<Organization | null> {
   return getOrganizationBySlugRepo(slug);
@@ -70,6 +96,11 @@ export async function getOrganizationBySlug(slug: string): Promise<Organization 
  * @param limit - Maximum number of organizations to return.
  * @param offset - Number of organizations to skip before returning results.
  * @returns An array of organizations.
+ *
+ * @example
+ * ```ts
+ * const orgs = await listOrganizations(20, 0);
+ * ```
  */
 export async function listOrganizations(limit = 50, offset = 0): Promise<Organization[]> {
   return listOrganizationsRepo(limit, offset);
@@ -82,6 +113,11 @@ export async function listOrganizations(limit = 50, offset = 0): Promise<Organiz
  * @param limit - Maximum number of organizations to return.
  * @param offset - Number of organizations to skip before returning results.
  * @returns An array of organizations.
+ *
+ * @example
+ * ```ts
+ * const startups = await listOrganizationsByType("Startup", 10, 0);
+ * ```
  */
 export async function listOrganizationsByType(
   type: Organization['type'],
@@ -98,26 +134,36 @@ export async function listOrganizationsByType(
  * @param id - The organization ID to update.
  * @param data - Partial organization update payload.
  * @returns The updated organization if found, otherwise null.
+ *
+ * @example
+ * ```ts
+ * const updated = await updateOrganization("user-uuid", "org-uuid", { name: "New Name" });
+ * ```
  */
 export async function updateOrganization(
   userId: string,
   id: string,
   data: UpdateOrganization,
 ): Promise<Organization | null> {
-  const updated = await updateOrganizationRepo(id, data);
+  return db.transaction().execute(async (trx) => {
+    const updated = await updateOrganizationRepo(id, data, trx);
 
-  if (updated) {
-    await createAuditLog({
-      actor_id: userId,
-      entity_type: 'organization',
-      entity_id: id,
-      event_type: 'organization.updated',
-      diff: data as Record<string, unknown>,
-      context: {},
-    });
-  }
+    if (updated) {
+      await createAuditLog(
+        {
+          actor_id: userId,
+          entity_type: 'organization',
+          entity_id: id,
+          event_type: 'organization.updated',
+          diff: data as Record<string, unknown>,
+          context: {},
+        },
+        trx,
+      );
+    }
 
-  return updated;
+    return updated;
+  });
 }
 
 /**
@@ -126,20 +172,31 @@ export async function updateOrganization(
  * @param userId - The ID of the user performing the deletion.
  * @param id - The organization ID to delete.
  * @returns True if the organization was deleted, otherwise false.
+ *
+ * @example
+ * ```ts
+ * const deleted = await deleteOrganization("user-uuid", "org-uuid");
+ * if (deleted) console.log("Deleted!");
+ * ```
  */
 export async function deleteOrganization(userId: string, id: string): Promise<boolean> {
-  const deleted = await deleteOrganizationRepo(id);
+  return db.transaction().execute(async (trx) => {
+    const deleted = await deleteOrganizationRepo(id, trx);
 
-  if (deleted) {
-    await createAuditLog({
-      actor_id: userId,
-      entity_type: 'organization',
-      entity_id: id,
-      event_type: 'organization.deleted',
-      diff: {},
-      context: {},
-    });
-  }
+    if (deleted) {
+      await createAuditLog(
+        {
+          actor_id: userId,
+          entity_type: 'organization',
+          entity_id: id,
+          event_type: 'organization.deleted',
+          diff: {},
+          context: {},
+        },
+        trx,
+      );
+    }
 
-  return deleted;
+    return deleted;
+  });
 }

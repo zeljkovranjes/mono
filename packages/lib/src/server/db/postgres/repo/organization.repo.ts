@@ -8,23 +8,24 @@ import { randomUUID } from 'crypto';
 import { nanoid } from 'nanoid';
 import { db } from '..';
 import { JsonObject } from '../../types/pg-database-types';
+import type { Kysely, Transaction } from 'kysely';
+import type { DB } from '../../types/pg-database-types';
+
+type Executor = Kysely<DB> | Transaction<DB>;
 
 /**
  * Create a new organization.
  *
- * @example
- * ```ts
- * const org = await createOrganization({
- *   name: "Acme Inc",
- *   slug: "acme-inc",
- *   type: "Startup",
- * });
- * ```
- *
  * @internal
+ * @param org - The organization creation payload.
+ * @param executor - Optional transaction or database instance (defaults to global db).
+ * @returns The newly created organization.
  */
-export async function createOrganization(org: CreateOrganization): Promise<Organization> {
-  const newOrganization = await db
+export async function createOrganization(
+  org: CreateOrganization,
+  executor: Executor = db,
+): Promise<Organization> {
+  const newOrganization = await executor
     .insertInto('organization')
     .values({
       id: randomUUID(),
@@ -43,15 +44,16 @@ export async function createOrganization(org: CreateOrganization): Promise<Organ
 /**
  * Get an organization by its ID.
  *
- * @example
- * ```ts
- * const org = await getOrganizationById("f47ac10b-58cc-4372-a567-0e02b2c3d479");
- * ```
- *
  * @internal
+ * @param id - The organization ID.
+ * @param executor - Optional transaction or database instance (defaults to global db).
+ * @returns The organization if found, otherwise null.
  */
-export async function getOrganizationById(id: string): Promise<Organization | null> {
-  const org = await db
+export async function getOrganizationById(
+  id: string,
+  executor: Executor = db,
+): Promise<Organization | null> {
+  const org = await executor
     .selectFrom('organization')
     .selectAll()
     .where('id', '=', id)
@@ -63,15 +65,16 @@ export async function getOrganizationById(id: string): Promise<Organization | nu
 /**
  * Get an organization by its slug.
  *
- * @example
- * ```ts
- * const org = await getOrganizationBySlug("acme-inc");
- * ```
- *
  * @internal
+ * @param slug - The organization slug.
+ * @param executor - Optional transaction or database instance (defaults to global db).
+ * @returns The organization if found, otherwise null.
  */
-export async function getOrganizationBySlug(slug: string): Promise<Organization | null> {
-  const org = await db
+export async function getOrganizationBySlug(
+  slug: string,
+  executor: Executor = db,
+): Promise<Organization | null> {
+  const org = await executor
     .selectFrom('organization')
     .selectAll()
     .where('slug', '=', slug)
@@ -81,17 +84,20 @@ export async function getOrganizationBySlug(slug: string): Promise<Organization 
 }
 
 /**
- * List organizations (with pagination).
- *
- * @example
- * ```ts
- * const orgs = await listOrganizations(20, 0); // first 20
- * ```
+ * List organizations with pagination.
  *
  * @internal
+ * @param limit - Maximum number of organizations to return (default 50).
+ * @param offset - Number of organizations to skip before returning results (default 0).
+ * @param executor - Optional transaction or database instance (defaults to global db).
+ * @returns An array of organizations.
  */
-export async function listOrganizations(limit = 50, offset = 0): Promise<Organization[]> {
-  const rows = await db
+export async function listOrganizations(
+  limit = 50,
+  offset = 0,
+  executor: Executor = db,
+): Promise<Organization[]> {
+  const rows = await executor
     .selectFrom('organization')
     .selectAll()
     .limit(limit)
@@ -103,21 +109,22 @@ export async function listOrganizations(limit = 50, offset = 0): Promise<Organiz
 }
 
 /**
- * List organizations by type (with pagination).
- *
- * @example
- * ```ts
- * const startups = await listOrganizationsByType("Startup", 20, 0);
- * ```
+ * List organizations filtered by type with pagination.
  *
  * @internal
+ * @param type - The organization type (e.g., "Startup").
+ * @param limit - Maximum number of organizations to return (default 50).
+ * @param offset - Number of organizations to skip before returning results (default 0).
+ * @param executor - Optional transaction or database instance (defaults to global db).
+ * @returns An array of organizations of the given type.
  */
 export async function listOrganizationsByType(
   type: Organization['type'],
   limit = 50,
   offset = 0,
+  executor: Executor = db,
 ): Promise<Organization[]> {
-  const rows = await db
+  const rows = await executor
     .selectFrom('organization')
     .selectAll()
     .where('type', '=', type)
@@ -131,22 +138,20 @@ export async function listOrganizationsByType(
 }
 
 /**
- * Update an organization.
- *
- * @example
- * ```ts
- * const updated = await updateOrganization("f47ac10b-58cc-4372-a567-0e02b2c3d479", {
- *   name: "Acme International",
- * });
- * ```
+ * Update an organization by ID.
  *
  * @internal
+ * @param id - The organization ID.
+ * @param data - Partial update payload for the organization.
+ * @param executor - Optional transaction or database instance (defaults to global db).
+ * @returns The updated organization if found, otherwise null.
  */
 export async function updateOrganization(
   id: string,
   data: UpdateOrganization,
+  executor: Executor = db,
 ): Promise<Organization | null> {
-  const updated = await db
+  const updated = await executor
     .updateTable('organization')
     .set({
       ...(data.name && { name: data.name }),
@@ -170,16 +175,12 @@ export async function updateOrganization(
 /**
  * Delete an organization by ID.
  *
- * @example
- * ```ts
- * const deleted = await deleteOrganization("f47ac10b-58cc-4372-a567-0e02b2c3d479");
- * if (deleted) console.log("Deleted!");
- * ```
- *
  * @internal
+ * @param id - The organization ID.
+ * @param executor - Optional transaction or database instance (defaults to global db).
+ * @returns True if the organization was deleted, otherwise false.
  */
-export async function deleteOrganization(id: string): Promise<boolean> {
-  const res = await db.deleteFrom('organization').where('id', '=', id).executeTakeFirst();
-
+export async function deleteOrganization(id: string, executor: Executor = db): Promise<boolean> {
+  const res = await executor.deleteFrom('organization').where('id', '=', id).executeTakeFirst();
   return (res.numDeletedRows ?? 0) > 0;
 }

@@ -1,6 +1,8 @@
 import { db } from '..';
 import { randomUUID } from 'crypto';
 import type { JsonObject } from '../../types/pg-database-types';
+import type { Kysely, Transaction } from 'kysely';
+import type { DB } from '../../types/pg-database-types';
 
 import {
   Project,
@@ -10,6 +12,8 @@ import {
   UpdateProject,
   UpdateProjectSchema,
 } from '@safeoutput/contracts/project/schema';
+
+type Executor = Kysely<DB> | Transaction<DB>;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function normalizeProject(row: any): Project {
@@ -23,22 +27,20 @@ export function normalizeProject(row: any): Project {
 /**
  * Create a new project.
  *
- * @example
- * ```ts
- * const project = await createProject({
- *   name: "SaaS #1",
- *   organization_id: "org-uuid",
- * });
- * ```
- *
  * @internal
+ * @param data - The project creation payload.
+ * @param executor - Optional transaction or database instance (defaults to global db).
+ * @returns The newly created project.
  */
-export async function createProject(data: CreateProject): Promise<Project> {
+export async function createProject(
+  data: CreateProject,
+  executor: Executor = db,
+): Promise<Project> {
   CreateProjectSchema.parse(data);
 
   const now = new Date().toISOString();
 
-  const newProject = await db
+  const newProject = await executor
     .insertInto('project')
     .values({
       id: randomUUID(),
@@ -57,36 +59,34 @@ export async function createProject(data: CreateProject): Promise<Project> {
 /**
  * Get a project by ID.
  *
- * @example
- * ```ts
- * const project = await getProjectById("f47ac10b-58cc-4372-a567-0e02b2c3d479");
- * ```
- *
  * @internal
+ * @param id - The project ID.
+ * @param executor - Optional transaction or database instance (defaults to global db).
+ * @returns The project if found, otherwise null.
  */
-export async function getProjectById(id: string): Promise<Project | null> {
-  const project = await db
+export async function getProjectById(id: string, executor: Executor = db): Promise<Project | null> {
+  const project = await executor
     .selectFrom('project')
     .selectAll()
     .where('id', '=', id)
     .executeTakeFirst();
+
   return project ? ProjectSchema.parse(normalizeProject(project)) : null;
 }
+
 /**
  * Get the organization ID for a given project.
  *
- * @example
- * ```ts
- * const orgId = await getOrganizationIdByProject("f47ac10b-58cc-4372-a567-0e02b2c3d479");
- * if (orgId) {
- *   console.log("Organization:", orgId);
- * }
- * ```
- *
  * @internal
+ * @param projectId - The project ID.
+ * @param executor - Optional transaction or database instance (defaults to global db).
+ * @returns The organization ID if found, otherwise null.
  */
-export async function getOrganizationIdByProject(projectId: string): Promise<string | null> {
-  const row = await db
+export async function getOrganizationIdByProject(
+  projectId: string,
+  executor: Executor = db,
+): Promise<string | null> {
+  const row = await executor
     .selectFrom('project')
     .select('organization_id')
     .where('id', '=', projectId)
@@ -98,19 +98,20 @@ export async function getOrganizationIdByProject(projectId: string): Promise<str
 /**
  * List projects for an organization (with pagination).
  *
- * @example
- * ```ts
- * const projects = await listProjectsByOrganization("org-uuid", 20, 0);
- * ```
- *
  * @internal
+ * @param organizationId - The organization ID.
+ * @param limit - Maximum number of projects to return.
+ * @param offset - Number of projects to skip before returning results.
+ * @param executor - Optional transaction or database instance (defaults to global db).
+ * @returns An array of projects.
  */
 export async function listProjectsByOrganization(
   organizationId: string,
   limit = 50,
   offset = 0,
+  executor: Executor = db,
 ): Promise<Project[]> {
-  const rows = await db
+  const rows = await executor
     .selectFrom('project')
     .selectAll()
     .where('organization_id', '=', organizationId)
@@ -125,19 +126,20 @@ export async function listProjectsByOrganization(
 /**
  * Update a project.
  *
- * @example
- * ```ts
- * const updated = await updateProject("f47ac10b-58cc-4372-a567-0e02b2c3d479", {
- *   name: "New Project Name",
- * });
- * ```
- *
  * @internal
+ * @param id - The project ID.
+ * @param data - Partial update payload for the project.
+ * @param executor - Optional transaction or database instance (defaults to global db).
+ * @returns The updated project if found, otherwise null.
  */
-export async function updateProject(id: string, data: UpdateProject): Promise<Project | null> {
+export async function updateProject(
+  id: string,
+  data: UpdateProject,
+  executor: Executor = db,
+): Promise<Project | null> {
   UpdateProjectSchema.parse(data);
 
-  const updated = await db
+  const updated = await executor
     .updateTable('project')
     .set({
       ...(data.name && { name: data.name }),
@@ -154,16 +156,12 @@ export async function updateProject(id: string, data: UpdateProject): Promise<Pr
 /**
  * Delete a project by ID.
  *
- * @example
- * ```ts
- * const deleted = await deleteProject("f47ac10b-58cc-4372-a567-0e02b2c3d479");
- * if (deleted) console.log("Deleted!");
- * ```
- *
  * @internal
+ * @param id - The project ID.
+ * @param executor - Optional transaction or database instance (defaults to global db).
+ * @returns True if the project was deleted, otherwise false.
  */
-export async function deleteProject(id: string): Promise<boolean> {
-  const res = await db.deleteFrom('project').where('id', '=', id).executeTakeFirst();
-
+export async function deleteProject(id: string, executor: Executor = db): Promise<boolean> {
+  const res = await executor.deleteFrom('project').where('id', '=', id).executeTakeFirst();
   return (res.numDeletedRows ?? 0) > 0;
 }

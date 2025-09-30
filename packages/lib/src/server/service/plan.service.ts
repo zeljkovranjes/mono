@@ -1,3 +1,4 @@
+// src/server/services/plan.service.ts
 import { Plan, CreatePlan, UpdatePlan } from '@safeoutput/contracts/plan/schema';
 
 import {
@@ -11,6 +12,7 @@ import {
 } from '../db/postgres/repo/plan.repo';
 
 import { createAuditLog } from '../db/postgres/repo/audit.repo';
+import { db } from '../db/postgres';
 
 /**
  * Service: create a new plan and log an audit entry.
@@ -18,20 +20,35 @@ import { createAuditLog } from '../db/postgres/repo/audit.repo';
  * @param userId - The ID of the user creating the plan.
  * @param data - The plan creation payload.
  * @returns The newly created plan.
+ *
+ * @example
+ * ```ts
+ * const plan = await createPlan("user-uuid", {
+ *   name: "Pro",
+ *   stripe_price_id: "price_123",
+ *   stripe_product_id: "prod_456",
+ *   price_per_month: 29,
+ * });
+ * ```
  */
 export async function createPlan(userId: string, data: CreatePlan): Promise<Plan> {
-  const plan = await createPlanRepo(data);
+  return db.transaction().execute(async (trx) => {
+    const plan = await createPlanRepo(data, trx);
 
-  await createAuditLog({
-    actor_id: userId,
-    entity_type: 'plan',
-    entity_id: plan.id,
-    event_type: 'plan.created',
-    diff: data as Record<string, unknown>,
-    context: {},
+    await createAuditLog(
+      {
+        actor_id: userId,
+        entity_type: 'plan',
+        entity_id: plan.id,
+        event_type: 'plan.created',
+        diff: data as Record<string, unknown>,
+        context: {},
+      },
+      trx,
+    );
+
+    return plan;
   });
-
-  return plan;
 }
 
 /**
@@ -39,6 +56,11 @@ export async function createPlan(userId: string, data: CreatePlan): Promise<Plan
  *
  * @param id - The unique plan ID.
  * @returns The plan if found, otherwise null.
+ *
+ * @example
+ * ```ts
+ * const plan = await getPlanById("plan-uuid");
+ * ```
  */
 export async function getPlanById(id: string): Promise<Plan | null> {
   return getPlanByIdRepo(id);
@@ -49,6 +71,11 @@ export async function getPlanById(id: string): Promise<Plan | null> {
  *
  * @param stripePriceId - The Stripe price ID.
  * @returns The plan if found, otherwise null.
+ *
+ * @example
+ * ```ts
+ * const plan = await getPlanByPriceId("price_123");
+ * ```
  */
 export async function getPlanByPriceId(stripePriceId: string): Promise<Plan | null> {
   return getPlanByPriceIdRepo(stripePriceId);
@@ -59,6 +86,11 @@ export async function getPlanByPriceId(stripePriceId: string): Promise<Plan | nu
  *
  * @param stripeProductId - The Stripe product ID.
  * @returns The plan if found, otherwise null.
+ *
+ * @example
+ * ```ts
+ * const plan = await getPlanByProductId("prod_456");
+ * ```
  */
 export async function getPlanByProductId(stripeProductId: string): Promise<Plan | null> {
   return getPlanByProductIdRepo(stripeProductId);
@@ -70,6 +102,11 @@ export async function getPlanByProductId(stripeProductId: string): Promise<Plan 
  * @param limit - Maximum number of plans to return.
  * @param offset - Number of plans to skip before returning results.
  * @returns An array of plans.
+ *
+ * @example
+ * ```ts
+ * const plans = await listPlans(20, 0);
+ * ```
  */
 export async function listPlans(limit = 50, offset = 0): Promise<Plan[]> {
   return listPlansRepo(limit, offset);
@@ -82,26 +119,38 @@ export async function listPlans(limit = 50, offset = 0): Promise<Plan[]> {
  * @param id - The plan ID to update.
  * @param data - Partial plan update payload.
  * @returns The updated plan if found, otherwise null.
+ *
+ * @example
+ * ```ts
+ * const updated = await updatePlan("user-uuid", "plan-uuid", {
+ *   price_per_month: 49,
+ * });
+ * ```
  */
 export async function updatePlan(
   userId: string,
   id: string,
   data: UpdatePlan,
 ): Promise<Plan | null> {
-  const updated = await updatePlanRepo(id, data);
+  return db.transaction().execute(async (trx) => {
+    const updated = await updatePlanRepo(id, data, trx);
 
-  if (updated) {
-    await createAuditLog({
-      actor_id: userId,
-      entity_type: 'plan',
-      entity_id: id,
-      event_type: 'plan.updated',
-      diff: data as Record<string, unknown>,
-      context: {},
-    });
-  }
+    if (updated) {
+      await createAuditLog(
+        {
+          actor_id: userId,
+          entity_type: 'plan',
+          entity_id: id,
+          event_type: 'plan.updated',
+          diff: data as Record<string, unknown>,
+          context: {},
+        },
+        trx,
+      );
+    }
 
-  return updated;
+    return updated;
+  });
 }
 
 /**
@@ -110,20 +159,31 @@ export async function updatePlan(
  * @param userId - The ID of the user performing the deletion.
  * @param id - The plan ID to delete.
  * @returns True if the plan was deleted, otherwise false.
+ *
+ * @example
+ * ```ts
+ * const deleted = await deletePlan("user-uuid", "plan-uuid");
+ * if (deleted) console.log("Deleted!");
+ * ```
  */
 export async function deletePlan(userId: string, id: string): Promise<boolean> {
-  const deleted = await deletePlanRepo(id);
+  return db.transaction().execute(async (trx) => {
+    const deleted = await deletePlanRepo(id, trx);
 
-  if (deleted) {
-    await createAuditLog({
-      actor_id: userId,
-      entity_type: 'plan',
-      entity_id: id,
-      event_type: 'plan.deleted',
-      diff: {},
-      context: {},
-    });
-  }
+    if (deleted) {
+      await createAuditLog(
+        {
+          actor_id: userId,
+          entity_type: 'plan',
+          entity_id: id,
+          event_type: 'plan.deleted',
+          diff: {},
+          context: {},
+        },
+        trx,
+      );
+    }
 
-  return deleted;
+    return deleted;
+  });
 }
