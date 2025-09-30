@@ -10,6 +10,26 @@ import {
   OrganizationSchema,
 } from '@safeoutput/contracts/organization/schema';
 
+function normalizeMember(member: any): any {
+  return {
+    ...member,
+    created_at:
+      member.created_at instanceof Date ? member.created_at.toISOString() : member.created_at,
+    updated_at:
+      member.updated_at instanceof Date ? member.updated_at.toISOString() : member.updated_at,
+  };
+}
+
+function normalizeOrg(org: any): any {
+  return {
+    ...org,
+    subscription_status: org.subscription_status ?? null,
+    current_plan_id: org.current_plan_id ?? null,
+    created_at: org.created_at instanceof Date ? org.created_at.toISOString() : org.created_at,
+    updated_at: org.updated_at instanceof Date ? org.updated_at.toISOString() : org.updated_at,
+  };
+}
+
 /**
  * Add a member to an organization.
  *
@@ -42,7 +62,7 @@ export async function addOrganizationMember(
     .returningAll()
     .executeTakeFirstOrThrow();
 
-  return OrganizationMemberSchema.parse(newMember);
+  return OrganizationMemberSchema.parse(normalizeMember(newMember));
 }
 
 /**
@@ -66,7 +86,7 @@ export async function getOrganizationMember(
     .where('user_id', '=', userId)
     .executeTakeFirst();
 
-  return member ? OrganizationMemberSchema.parse(member) : null;
+  return member ? OrganizationMemberSchema.parse(normalizeMember(member)) : null;
 }
 
 /**
@@ -93,7 +113,7 @@ export async function listOrganizationMembers(
     .orderBy('created_at', 'asc')
     .execute();
 
-  return rows.map((row) => OrganizationMemberSchema.parse(row));
+  return rows.map((row) => OrganizationMemberSchema.parse(normalizeMember(row)));
 }
 
 /**
@@ -115,7 +135,7 @@ export async function listUserOrganizations(userId: string): Promise<Organizatio
     .orderBy('organization.created_at', 'desc')
     .execute();
 
-  return rows.map((row) => OrganizationSchema.parse(row));
+  return rows.map((row) => OrganizationSchema.parse(normalizeOrg(row)));
 }
 
 /**
@@ -162,7 +182,7 @@ export async function isUserInOrganization(
 ): Promise<boolean> {
   const res = await db
     .selectFrom('organization_member')
-    .select('user_id')
+    .selectAll()
     .where('organization_id', '=', organizationId)
     .where('user_id', '=', userId)
     .executeTakeFirst();
