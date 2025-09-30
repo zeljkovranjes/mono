@@ -112,20 +112,26 @@ export const GatewayHeadersSchema = z.object({
 export interface ApiContract {
   method: z.infer<typeof HttpMethodSchema>;
   path: string;
-  headers?: z.ZodSchema;
-  params?: z.ZodSchema;
-  query?: z.ZodSchema;
-  body?: z.ZodSchema;
-  response: z.ZodSchema;
-  description?: string;
-  tags?: string[];
+  schema: {
+    description?: string;
+    tags?: string[];
+    headers?: z.ZodSchema;
+    params?: z.ZodSchema;
+    query?: z.ZodSchema;
+    body?: z.ZodSchema;
+
+    response: Record<number, z.ZodSchema>;
+  };
 }
 
 export type InferRequest<T extends ApiContract> = {
-  headers: T['headers'] extends z.ZodSchema ? z.infer<T['headers']> : undefined;
-  params: T['params'] extends z.ZodSchema ? z.infer<T['params']> : undefined;
-  query: T['query'] extends z.ZodSchema ? z.infer<T['query']> : undefined;
-  body: T['body'] extends z.ZodSchema ? z.infer<T['body']> : undefined;
+  headers: T['schema']['headers'] extends z.ZodSchema ? z.infer<T['schema']['headers']> : undefined;
+  params: T['schema']['params'] extends z.ZodSchema ? z.infer<T['schema']['params']> : undefined;
+  query: T['schema']['query'] extends z.ZodSchema ? z.infer<T['schema']['query']> : undefined;
+  body: T['schema']['body'] extends z.ZodSchema ? z.infer<T['schema']['body']> : undefined;
 };
 
-export type InferResponse<T extends ApiContract> = z.infer<T['response']>;
+export type InferResponse<
+  T extends ApiContract,
+  Code extends keyof T['schema']['response'] = 200,
+> = z.infer<T['schema']['response'][Code]>;

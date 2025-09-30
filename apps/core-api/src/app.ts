@@ -2,17 +2,12 @@ import path from 'node:path';
 import fs from 'node:fs';
 import fastifyAutoload from '@fastify/autoload';
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
+import { validatorCompiler, serializerCompiler, ZodTypeProvider } from 'fastify-type-provider-zod';
 
 export const options = {
-  ajv: {
-    customOptions: {
-      coerceTypes: 'array',
-      removeAdditional: 'all',
-    },
-  },
+  ajv: false,
 };
 
-// Helper function to safely load directories
 async function safeAutoload(
   fastify: FastifyInstance,
   dirPath: string,
@@ -33,23 +28,23 @@ async function safeAutoload(
 export default async function serviceApp(fastify: FastifyInstance, opts: FastifyPluginOptions) {
   const baseDir = __dirname;
 
+  fastify.setValidatorCompiler(validatorCompiler);
+  fastify.setSerializerCompiler(serializerCompiler);
+
+  const f = fastify.withTypeProvider<ZodTypeProvider>();
+
   // Load all directories with simplified calls
   await safeAutoload(
-    fastify,
+    f,
     path.join(baseDir, 'plugins/external'),
     { options: {} },
     'External Plugins',
   );
 
-  await safeAutoload(
-    fastify,
-    path.join(baseDir, 'plugins/app'),
-    { options: { ...opts } },
-    'App Plugins',
-  );
+  await safeAutoload(f, path.join(baseDir, 'plugins/app'), { options: { ...opts } }, 'App Plugins');
 
   await safeAutoload(
-    fastify,
+    f,
     path.join(baseDir, 'routes'),
     {
       autoHooks: true,
@@ -60,8 +55,8 @@ export default async function serviceApp(fastify: FastifyInstance, opts: Fastify
   );
 
   // Error handler
-  fastify.setErrorHandler((err, request, reply) => {
-    fastify.log.error(
+  f.setErrorHandler((err, request, reply) => {
+    f.log.error(
       {
         err,
         request: {
@@ -85,7 +80,7 @@ export default async function serviceApp(fastify: FastifyInstance, opts: Fastify
   });
 
   // Not found handler
-  fastify.setNotFoundHandler((request, reply) => {
+  f.setNotFoundHandler((request, reply) => {
     request.log.warn(
       {
         request: {

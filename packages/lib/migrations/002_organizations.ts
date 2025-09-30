@@ -11,8 +11,8 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('slug', 'varchar(255)', (col) => col.notNull())
     .addColumn('type', 'varchar(255)', (col) => col.notNull()) // keep text per your example
     .addColumn('metadata', 'jsonb', (col) => col.notNull().defaultTo(sql`'{}'::jsonb`))
-    .addColumn('stripe_customer_id', 'varchar(255)')
-    .addColumn('stripe_subscription_status', 'varchar(255)')
+    .addColumn('customer_id', 'varchar(255)')
+    .addColumn('subscription_status', 'varchar(255)')
     .addColumn('current_plan_id', 'uuid', (col) => col.references('plan.id').onDelete('set null'))
     .addColumn('created_at', 'timestamp', (col) => col.notNull().defaultTo(sql`now()`))
     .addColumn('updated_at', 'timestamp', (col) => col.notNull().defaultTo(sql`now()`))

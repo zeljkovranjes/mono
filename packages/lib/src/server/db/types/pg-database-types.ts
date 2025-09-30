@@ -3,12 +3,11 @@
  * Please do not edit it manually.
  */
 
-import type { ColumnType } from 'kysely';
+import type { ColumnType } from "kysely";
 
-export type Generated<T> =
-  T extends ColumnType<infer S, infer I, infer U>
-    ? ColumnType<S, I | undefined, U>
-    : ColumnType<T, T | undefined, T>;
+export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
+  ? ColumnType<S, I | undefined, U>
+  : ColumnType<T, T | undefined, T>;
 
 export type Json = JsonValue;
 
@@ -55,12 +54,12 @@ export interface Invitation {
 export interface Organization {
   created_at: Generated<Timestamp>;
   current_plan_id: string | null;
+  customer_id: string | null;
   id: Generated<string>;
   metadata: Generated<Json>;
   name: string;
   slug: string;
-  stripe_customer_id: string | null;
-  stripe_subscription_status: string | null;
+  subscription_status: string | null;
   type: string;
   updated_at: Generated<Timestamp>;
 }

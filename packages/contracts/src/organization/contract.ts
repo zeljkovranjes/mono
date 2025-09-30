@@ -18,92 +18,137 @@ import {
 export const OrganizationsContract = {
   list: {
     method: 'GET',
-    path: '/api/organizations',
-    headers: GatewayHeadersSchema,
-    query: PaginationQuerySchema.extend({
-      type: OrganizationTypeSchema.optional(),
-    }),
-    response: createPaginatedResponse(OrganizationSchema),
-    description: 'List organizations',
+    path: '/',
+    schema: {
+      description: 'List organizations',
+      tags: ['organizations'],
+      headers: GatewayHeadersSchema,
+      query: PaginationQuerySchema.extend({
+        type: OrganizationTypeSchema.optional(),
+      }),
+      response: {
+        200: createPaginatedResponse(OrganizationSchema),
+      },
+    },
   },
 
   create: {
     method: 'POST',
-    path: '/api/organizations',
-    headers: GatewayHeadersSchema,
-    body: CreateOrganizationSchema,
-    response: createApiResponse(OrganizationSchema),
-    description: 'Create organization',
+    path: '/',
+    schema: {
+      description: 'Create organization',
+      tags: ['organizations'],
+      headers: GatewayHeadersSchema,
+      body: CreateOrganizationSchema,
+      response: {
+        201: createApiResponse(OrganizationSchema),
+      },
+    },
   },
 
   get: {
     method: 'GET',
-    path: '/api/organizations/:id',
-    headers: GatewayHeadersSchema,
-    params: z.object({ id: z.uuid() }),
-    response: createApiResponse(OrganizationSchema),
-    description: 'Get organization',
+    path: '/:id',
+    schema: {
+      description: 'Get organization',
+      tags: ['organizations'],
+      headers: GatewayHeadersSchema,
+      params: z.object({ id: z.uuid() }),
+      response: {
+        200: createApiResponse(OrganizationSchema),
+      },
+    },
   },
 
   getBySlug: {
     method: 'GET',
-    path: '/api/organizations/slug/:slug',
-    headers: GatewayHeadersSchema,
-    params: z.object({ slug: z.string() }),
-    response: createApiResponse(OrganizationSchema),
-    description: 'Get organization by slug',
+    path: '/slug/:slug',
+    schema: {
+      description: 'Get organization by slug',
+      tags: ['organizations'],
+      headers: GatewayHeadersSchema,
+      params: z.object({ slug: z.string() }),
+      response: {
+        200: createApiResponse(OrganizationSchema),
+      },
+    },
   },
 
   update: {
     method: 'PUT',
-    path: '/api/organizations/:id',
-    headers: GatewayHeadersSchema,
-    params: z.object({ id: z.uuid() }),
-    body: UpdateOrganizationSchema,
-    response: createApiResponse(OrganizationSchema),
-    description: 'Update organization',
+    path: '/:id',
+    schema: {
+      description: 'Update organization',
+      tags: ['organizations'],
+      headers: GatewayHeadersSchema,
+      params: z.object({ id: z.uuid() }),
+      body: UpdateOrganizationSchema,
+      response: {
+        200: createApiResponse(OrganizationSchema),
+      },
+    },
   },
 
   delete: {
     method: 'DELETE',
-    path: '/api/organizations/:id',
-    headers: GatewayHeadersSchema,
-    params: z.object({ id: z.uuid() }),
-    response: createApiResponse(z.object({ deleted: z.boolean() })),
-    description: 'Delete organization',
+    path: '/:id',
+    schema: {
+      description: 'Delete organization',
+      tags: ['organizations'],
+      headers: GatewayHeadersSchema,
+      params: z.object({ id: z.uuid() }),
+      response: {
+        200: createApiResponse(z.object({ deleted: z.boolean() })),
+      },
+    },
   },
 } satisfies Record<string, ApiContract>;
 
 export const OrganizationMembersContract = {
   list: {
     method: 'GET',
-    path: '/api/organizations/:organization_id/members',
-    headers: GatewayHeadersSchema,
-    params: z.object({ organization_id: z.uuid() }),
-    query: PaginationQuerySchema,
-    response: createPaginatedResponse(OrganizationMemberSchema),
-    description: 'List organization members',
+    path: '/:organization_id/members',
+    schema: {
+      description: 'List organization members',
+      tags: ['organization-members'],
+      headers: GatewayHeadersSchema,
+      params: z.object({ organization_id: z.uuid() }),
+      query: PaginationQuerySchema,
+      response: {
+        200: createPaginatedResponse(OrganizationMemberSchema),
+      },
+    },
   },
 
   add: {
     method: 'POST',
-    path: '/api/organizations/:organization_id/members',
-    headers: GatewayHeadersSchema,
-    params: z.object({ organization_id: z.uuid() }),
-    body: AddMemberSchema,
-    response: createApiResponse(OrganizationMemberSchema),
-    description: 'Add member to organization',
+    path: '/:organization_id/members',
+    schema: {
+      description: 'Add member to organization',
+      tags: ['organization-members'],
+      headers: GatewayHeadersSchema,
+      params: z.object({ organization_id: z.uuid() }),
+      body: AddMemberSchema,
+      response: {
+        201: createApiResponse(OrganizationMemberSchema),
+      },
+    },
   },
 
   remove: {
     method: 'DELETE',
-    path: '/api/organizations/:organization_id/members/:user_id',
-    headers: GatewayHeadersSchema,
-    params: z.object({
-      organization_id: z.uuid(),
-      user_id: z.uuid(),
-    }),
-    response: createApiResponse(z.object({ removed: z.boolean() })),
-    description: 'Remove member from organization',
+    path: '/:organization_id/members/:user_id',
+    schema: {
+      description: 'Remove member from organization',
+      tags: ['organization-members'],
+      headers: GatewayHeadersSchema,
+      params: z.object({
+        organization_id: z.uuid(),
+        user_id: z.uuid(),
+      }),
+      response: {
+        200: createApiResponse(z.object({ removed: z.boolean() })),
+      },
+    },
   },
 } satisfies Record<string, ApiContract>;

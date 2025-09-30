@@ -1,15 +1,17 @@
 import z from 'zod';
 
-export const StripeSubscriptionStatusSchema = z.enum([
-  'incomplete',
-  'incomplete_expired',
-  'trialing',
-  'active',
-  'past_due',
-  'canceled',
-  'unpaid',
-  'paused',
-]);
+export const StripeSubscriptionStatusSchema = z
+  .enum([
+    'incomplete',
+    'incomplete_expired',
+    'trialing',
+    'active',
+    'past_due',
+    'canceled',
+    'unpaid',
+    'paused',
+  ])
+  .nullable();
 
 export const OrganizationTypeSchema = z.enum([
   'Personal',
@@ -32,8 +34,12 @@ export const OrganizationSchema = z.object({
   metadata: z.record(z.string(), z.unknown()).default({}),
   subscription_status: StripeSubscriptionStatusSchema.nullable(),
   current_plan_id: z.uuid().nullable(),
-  created_at: z.iso.datetime(),
-  updated_at: z.iso.datetime(),
+  created_at: z
+    .union([z.string(), z.date()])
+    .transform((val) => (val instanceof Date ? val.toISOString() : val)),
+  updated_at: z
+    .union([z.string(), z.date()])
+    .transform((val) => (val instanceof Date ? val.toISOString() : val)),
 });
 
 export const CreateOrganizationSchema = z.object({

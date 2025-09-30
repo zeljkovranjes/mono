@@ -3,14 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "exports": {
-    "./audit/schema": "./src/audit/schema.ts",
-    "./audit/contract": "./src/audit/contract.ts",
-    "./organization/schema": "./src/organization/schema.ts",
-    "./organization/contract": "./src/organizationan/contract.ts",
-    "./plan/schema": "./src/plan/schema.ts",
-    "./plan/contract": "./src/plan/contract.ts",
-    "./project/schema": "./src/project/schema.ts",
-    "./project/contract": "./src/project/contract.ts",
     "./*": "./src/*.ts"
   },
   "scripts": {
