@@ -20,7 +20,7 @@ const listMyOrganizationsRoute: FastifyPluginAsync = async (fastify) => {
         .code(200)
         .send(
           toOkResponse(
-            '/api/organizations/mine',
+            '/api/organizations/list/mine',
             'Organizations fetched successfully',
             200,
             organizations,
