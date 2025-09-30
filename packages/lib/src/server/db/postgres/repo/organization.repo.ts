@@ -5,7 +5,7 @@ import {
   UpdateOrganization,
 } from '@safeoutput/contracts/organization/schema';
 import { randomUUID } from 'crypto';
-import { customAlphabet, nanoid } from 'nanoid';
+import { customAlphabet } from 'nanoid';
 import { db } from '..';
 import { JsonObject } from '../../types/pg-database-types';
 import type { Kysely, Transaction } from 'kysely';
