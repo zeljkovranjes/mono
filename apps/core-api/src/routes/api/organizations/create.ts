@@ -3,7 +3,7 @@ import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { createOrganizationWithOwner } from '@safeoutput/lib/server/service/organization.service';
 import { AppError, toOkResponse } from '@safeoutput/lib/shared/utils/response';
 import { OrganizationsContract } from '@safeoutput/contracts/organization/contract';
-import { requireAuthMiddleware, setSession } from '@safeoutput/lib/server/auth/middleware/fastify';
+import { requireAuthMiddleware } from '@safeoutput/lib/server/auth/middleware/fastify';
 
 const createOrganizationRoute: FastifyPluginAsync = async (fastify) => {
   const contract = OrganizationsContract.create;
