@@ -224,3 +224,40 @@ ory tunnel   --project {project_id}   --cookie-domain localhost   http://localho
 
 </details>
 
+<details><summary><b>Repository Setup</b></summary>
+The repository structure is not really optimized.
+
+
+## 1. Environment Setup
+I'm going to assume you will be using the Ory Network. So at the mono repo root.
+paste the following code
+
+```
+NODE_ENV=development                     # not needed in vite because it automatically gets injected
+LOG_LEVEL=trace                          # trace | debug | info | warn | error | fatal
+
+ORY_ADMIN_API_TOKEN=ory_admin_api_token
+REMEMBER_CONSENT_SESSION_FOR_SECONDS=3600
+
+COOKIE_SECRET=changeme12345adssd12dads12
+CSRF_COOKIE_NAME=__Host-safeoutput.com-x-csrf-token
+CSRF_COOKIE_SECRET=somesecretvaluedsadas
+DANGEROUSLY_DISABLE_SECURE_CSRF_COOKIES=true
+MOCK_TLS_TERMINATION=false
+
+API_SECRET_KEY=an_api_super_secret_key
+
+STRIPE_SECRET_KEY=stripe_secret_key
+STRIPE_WEBHOOK_SECRET=stripe_webhook_secret
+
+POSTGRES_DATABASE_URL=postgres://{username}:{password}@{host}:{port}/{database}
+
+OTEL_EXPORTER_URL=http://localhost:4318/v1/traces
+
+
+VITE_ROOT_DOMAIN=http://localhost:3000              # e.g. http://localhost:3000
+VITE_ORY_SDK_URL=http://localhost:4000     # e.g. http://ory-network:4000
+```
+
+**Then copy and paste the mono repo env into apps/dashboard.**
+<details>
