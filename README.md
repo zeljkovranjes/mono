@@ -111,7 +111,7 @@ And paste the following code.
 
 ## 3. Setting up Keto (Namespace & Rules)
 * Go into Permissions -> Namespace & rules and paste the following code.
-```json
+```
 import { Namespace, SubjectSet, Context } from "@ory/permission-namespace-types"
 
 // Defines a User. This class is primarily used as a type in relationships.
