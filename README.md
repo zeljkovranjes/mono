@@ -1,9 +1,11 @@
 # Mono
 [![GitHub Stars](https://img.shields.io/github/stars/zeljkovranjes/mono.svg)](https://github.com/zeljkovranjes/mono/stargazers)
 [![GitHub Issues](https://img.shields.io/github/issues/zeljkovranjes/mono.svg)](https://github.com/zeljkovranjes/mono/issues)
-[![Current Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/zeljkovranjes/mono)
+[![Current Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/zeljkovranjes/mono)
 
 Mono is a SaaS monolith boilerplate application with a simple multi-tenant architecture. It’s fairly barebones and missing several routes, which you can easily implement yourself. However, all the core functions needed to build those routes are already included. I plan to add and push these routes over time, **though development is currently on and off**.
+
+NOT PRODUCTION READY. UNTIL YOU IMPLEMENT THE ENTIRE ORY FLOW AND NECESSARY ROUTES.
 
 This project was built around utilizing Ory and in my case I utilized the Ory Network. It's recommended to use it or else you will have to heavily edit the code.
 
