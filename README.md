@@ -25,13 +25,13 @@ This project was built around utilizing Ory and in my case I utilized the Ory Ne
 # CLI 
 You can manage the CLI via the following commands
 
-``` turbo run dev```
+```turbo run dev```
 
-``` turbo run build```
+```turbo run build```
 
-``` turbo run test``` -- some tests will fail (didnt fix them as of yet)
+```turbo run test``` -- some tests will fail (didnt fix them as of yet)
 
-``` turbo run lint``` -- some lints will fail (didnt fix them as of yet)
+```turbo run lint``` -- some lints will fail (didnt fix them as of yet)
 
 
 
