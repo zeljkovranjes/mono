@@ -216,7 +216,11 @@ key name: **Authorization**
 Key value: Bearer {API_SECRET_KEY} (the value from the .env) then click **save action**. MAKE SURE YOU INCLUDE "Bearer"!!!
 
 ## 6. Setting up Ory Tunnel
-* Install the Ory Tunnel CLI here https://www.ory.sh/docs/cli/ory-tunnel. Then run the following command.
+* Install the Ory Tunnel CLI here https://www.ory.sh/docs/cli/ory-tunnel. Then run the following command. Then run the following commmand
+
+```
+ory tunnel   --project {project_id}   --cookie-domain localhost   http://localhost:3000
+```
 
 </details>
 
