@@ -274,3 +274,16 @@ VITE_ORY_SDK_URL=http://localhost:4000     # e.g. http://ory-network:4000
 
 **Then copy and paste the mono repo env into apps/dashboard.**
 <details>
+
+# Middleware
+I created a few helpful middlewares that might come use to you when you're building with fastify. If you would like to know how to use them in fastify please refer to the apps/core-api/routes
+
+requireAuthMiddleware
+
+requireNoAuthMiddleware
+
+setSession (Deprecated) please dont use this.
+
+requirePermissionMiddleware
+
+requireSecretMiddleware
