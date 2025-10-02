@@ -213,7 +213,7 @@ When it shows authentication Click Authentication type: **Key** and put the Tran
 
 key name: **Authorization**
 
-Key value: Bearer {API_SECRET_KEY} (the value from the .env) then click **save action**.
+Key value: Bearer {API_SECRET_KEY} (the value from the .env) then click **save action**. MAKE SURE YOU INCLUDE "Bearer"!!!
 
 ## 6. Setting up Ory Tunnel
 * Install the Ory Tunnel CLI here https://www.ory.sh/docs/cli/ory-tunnel. Then run the following command.
