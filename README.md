@@ -36,6 +36,7 @@ You can manage the CLI via the following commands
 
 
 # Installation (Local Development)
+After following the instructions you can run **pnpm install** wherever is necessary. You can run the repos individually as well with **pnpm run dev** inside the desired server.
 
 <details><summary><b>Ory Network Setup</b></summary>
 
@@ -239,7 +240,6 @@ ory tunnel   --project {project_id}   --cookie-domain localhost   http://localho
 
 <details><summary><b>Repository Setup</b></summary>
 The repository structure is not really optimized.
-
 
 ## 1. Environment Setup
 I'm going to assume you will be using the Ory Network. So at the mono repo root.
